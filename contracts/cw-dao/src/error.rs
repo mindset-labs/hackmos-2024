@@ -6,6 +6,12 @@ pub enum ContractError {
     #[error("{0}")]
     Std(#[from] StdError),
 
+    #[error("Invalid category")]
+    InvalidCategory {},
+
+    #[error("Invalid royalty fee")]
+    InvalidRoyaltyFee {},
+
     #[error("Unauthorized")]
     Unauthorized {},
     // Add any other custom errors you like here.

@@ -132,7 +132,7 @@ pub enum QueryMsg {
     // Returns metadata about one particular token, based on *ERC721 Metadata JSON Schema*
     // but directly from the contract
     // TODO: replace String with a custom struct
-    #[returns(cw721::NftInfoResponse<String>)]
+    #[returns(cw721::NftInfoResponse)]
     NftInfo { token_id: String },
 
     #[returns(cw20::BalanceResponse)]
@@ -144,7 +144,7 @@ pub enum QueryMsg {
     // Returns the result of both `NftInfo` and `OwnerOf` as one query as an optimization
     // for clients
     // TODO: replace String with a custom struct
-    #[returns(cw721::AllNftInfoResponse<String>)]
+    #[returns(cw721::AllNftInfoResponse)]
     AllNftInfo {
         token_id: String,
         // unset or false will filter out expired approvals, you must set to true to see them

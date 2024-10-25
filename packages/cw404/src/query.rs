@@ -29,13 +29,13 @@ pub fn num_tokens(deps: Deps) -> StdResult<NumTokensResponse> {
     })
 }
 
-pub fn nft_info(deps: Deps, token_id: String) -> StdResult<cw721::NftInfoResponse<String>> { // TODO: Check replace string with struct
+pub fn nft_info(deps: Deps, token_id: String) -> StdResult<cw721::NftInfoResponse> { // TODO: Check replace string with struct
     let base_uri = BASE_TOKEN_URI
         .may_load(deps.storage)?
         .unwrap_or("".to_string());
     Ok(NftInfoResponse {
         token_uri: Some(base_uri + &token_id),
-        extension: "".to_string(),
+        extension: None,
     })
 }
 
@@ -172,7 +172,7 @@ pub fn all_nft_info(
     _env: Env,
     token_id: String,
     _include_expired: bool,
-) -> StdResult<cw721::AllNftInfoResponse<String>> { // TODO: Check replace string with struct
+) -> StdResult<cw721::AllNftInfoResponse> { // TODO: Check replace string with struct
     let owner = OWNER_OF
         .may_load(deps.storage, token_id.clone())?
         .unwrap_or("".to_string());

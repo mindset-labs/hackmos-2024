@@ -5,7 +5,7 @@ use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Repl
 use crate::error::ContractError;
 use crate::execute::{execute_launch_property, execute_set_property_contract_code_id, execute_update_admins};
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::query::{query_all_properties, query_config, query_property, query_property_contract_code_id, query_stats};
+use crate::query::{query_all_properties, query_config, query_metadata, query_property, query_property_contract_code_id, query_stats};
 use crate::reply::{reply_instantiate_property, ReplyMessageId};
 use crate::state::{Config, DAOStats, CONFIG, DAO_METADATA, DAO_STATS};
 
@@ -61,6 +61,7 @@ pub fn execute(
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetConfig {} => to_json_binary(&query_config(deps)?),
+        QueryMsg::GetMetadata {} => to_json_binary(&query_metadata(deps)?),
         QueryMsg::GetPropertyContractCodeId {} => to_json_binary(&query_property_contract_code_id(deps)?),
         QueryMsg::GetAllProperties {} => to_json_binary(&query_all_properties(deps)?),
         QueryMsg::GetProperty { id } => to_json_binary(&query_property(deps, id)?),

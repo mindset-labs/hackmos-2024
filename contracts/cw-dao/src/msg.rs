@@ -22,6 +22,8 @@ pub enum ExecuteMsg {
 pub enum QueryMsg {
     #[returns(Config)]
     GetConfig {},
+    #[returns(DAOMetadata)]
+    GetMetadata {},
     #[returns(Option<u64>)]
     GetPropertyContractCodeId {},
     #[returns(Vec<DAOProperty>)]

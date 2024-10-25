@@ -44,11 +44,14 @@ pub fn reply_instantiate_property(deps: DepsMut, msg: Reply) -> Result<Response,
             .map(|attr| attr.value.clone())
             .expect("context should be present in reply");
     
-    let property_data = DAO_PROPERTIES_DRAFT.may_load(deps.storage, owner_address_unchecked)?
+    let property_data = DAO_PROPERTIES_DRAFT.may_load(deps.storage, owner_address_unchecked.clone())?
         .ok_or(ContractError::PropertyDataNotFound {})?;
 
     // save the property data under the property contract address
-    DAO_PROPERTIES.save(deps.storage, property_contract_address, &property_data.clone())?;
+    DAO_PROPERTIES.save(deps.storage, property_contract_address.clone(), &property_data.clone())?;
+    
+    // remove the property data from the draft
+    DAO_PROPERTIES_DRAFT.remove(deps.storage, owner_address_unchecked);
 
     Ok(Response::default())
 }

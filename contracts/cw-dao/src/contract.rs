@@ -72,4 +72,128 @@ pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractEr
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use cosmwasm_std::{coins, Addr};
+    use cw_multi_test::{error::AnyResult, App, ContractWrapper, Executor};
+
+    use crate::msg::ExecuteMsg;
+
+    pub struct DaoCodeId(u64);
+
+    impl DaoCodeId {
+        pub fn store_code(app: &mut App) -> Self {
+            let contract = ContractWrapper::new(
+                crate::contract::execute,
+                crate::contract::instantiate,
+                crate::contract::query,
+            );
+            let code_id = app.store_code(Box::new(contract));
+            Self(code_id)
+        }
+
+        #[allow(clippy::too_many_arguments)]
+        pub fn instantiate(
+            self,
+            app: &mut App,
+            sender: Addr,
+            label: &str,
+        ) -> AnyResult<DaoContract> {
+            DaoContract::instantiate(app, self, sender, label)
+        }
+    }
+
+    pub struct DaoContract(Addr);
+
+    impl DaoContract {
+        pub fn addr(&self) -> Addr {
+            self.0.clone()
+        }
+    
+        #[allow(clippy::too_many_arguments)]
+        #[track_caller]
+        pub fn instantiate(
+            app: &mut App,
+            code_id: DaoCodeId,
+            sender: Addr,
+            label: &str,
+        ) -> AnyResult<Self> {
+            let init_msg = crate::msg::InstantiateMsg {
+                admins: vec![],
+                metadata: crate::state::DAOMetadata {
+                    name: "test".to_string(),
+                    description: Some("test".to_string()),
+                    // links: vec![],
+                    symbol: Some("test".to_string()),
+                    image_uri: None,
+                    category: crate::state::DAOCategory::Other,
+                    category_other: Some("Car Rental".to_string()),
+                },
+                default_royalty_fee: None,
+                property_contract_code_id: None,
+            };
+            app.instantiate_contract(code_id.0, sender, &init_msg, &[], label, None)
+                .map(Self::from)
+        }
+    }
+
+    impl From<Addr> for DaoContract {
+        fn from(value: Addr) -> Self {
+            Self(value)
+        }
+    }
+
+    fn mock_app() -> App {
+        App::new(|router, _api, storage| {
+            router
+                .bank
+                .init_balance(
+                    storage,
+                    &Addr::unchecked("owner"),
+                    coins(1_000_000, "utoken"),
+                )
+                .unwrap();
+        })
+    }
+
+    #[test]
+    fn basic_initialization() {
+        let mut app = mock_app();
+        let owner = app.api().addr_make(&"owner".to_string());
+        let dao_code_id = DaoCodeId::store_code(&mut app);
+        dao_code_id.instantiate(&mut app, owner.clone(), "test").unwrap();
+    }
+
+    #[test]
+    fn owner_can_update_admins() {
+        let mut app = mock_app();
+        let owner = app.api().addr_make(&"owner".to_string());
+        let dao_code_id = DaoCodeId::store_code(&mut app);
+        let dao_addr = dao_code_id.instantiate(&mut app, owner.clone(), "test").unwrap();
+
+        let new_admin = app.api().addr_make(&"new_admin".to_string());
+        app.execute_contract(
+            owner.clone(),
+            dao_addr.addr(),
+            &ExecuteMsg::UpdateAdmins { add: vec![new_admin.clone()], remove: vec![] },
+            &[],
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn non_owner_cannot_update_admins() {
+        let mut app = mock_app();
+        let owner = app.api().addr_make(&"owner".to_string());
+        let dao_code_id = DaoCodeId::store_code(&mut app);
+        let dao_addr = dao_code_id.instantiate(&mut app, owner.clone(), "test").unwrap();
+
+        let new_admin = app.api().addr_make(&"new_admin".to_string());
+        app.execute_contract(
+            new_admin.clone(),
+            dao_addr.addr(),
+            &ExecuteMsg::UpdateAdmins { add: vec![new_admin.clone()], remove: vec![] },
+            &[],
+        )
+        .unwrap_err();
+    }
+}

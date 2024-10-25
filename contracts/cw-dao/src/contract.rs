@@ -3,9 +3,10 @@ use cosmwasm_std::entry_point;
 use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
 
 use crate::error::ContractError;
-use crate::execute::{launch_property, set_property_contract_code_id, update_admins};
+use crate::execute::{execute_launch_property, execute_set_property_contract_code_id, execute_update_admins};
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::query::{query_all_properties, query_config, query_property, query_property_contract_code_id, query_stats};
+use crate::reply::{reply_instantiate_property, ReplyMessageId};
 use crate::state::{Config, DAOStats, CONFIG, DAO_METADATA, DAO_STATS};
 
 const CONTRACT_NAME: &str = "crates.io:cw-dao";
@@ -37,7 +38,8 @@ pub fn instantiate(
     DAO_STATS.save(deps.storage, &DAOStats::default())?;
 
     Ok(Response::default()
-        .add_attribute("action", "instantiate"))
+        .add_attribute("action", "instantiate")
+        .add_attribute("contract_address", env.contract.address.to_string()))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -48,9 +50,9 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     let response = match msg {
-        ExecuteMsg::SetPropertyContractCodeId { code_id } => set_property_contract_code_id(deps, info, code_id)?,
-        ExecuteMsg::LaunchProperty { data } => launch_property(deps, env, info, data)?,
-        ExecuteMsg::UpdateAdmins { add, remove } => update_admins(deps, info, add, remove)?,
+        ExecuteMsg::SetPropertyContractCodeId { code_id } => execute_set_property_contract_code_id(deps, info, code_id)?,
+        ExecuteMsg::LaunchProperty { data } => execute_launch_property(deps, env, info, data)?,
+        ExecuteMsg::UpdateAdmins { add, remove } => execute_update_admins(deps, info, add, remove)?,
     };
     Ok(response)
 }
@@ -68,16 +70,32 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractError> {
-    unimplemented!()
+    match ReplyMessageId::try_from(msg.id) {
+        Ok(ReplyMessageId::InstantiateProperty) => Ok(reply_instantiate_property(deps, msg)?),
+        Err(e) => Err(e),
+    }
 }
 
+/// 
+/// 
+/// 
+/// 
+/// Tests
+/// 
+/// 
+/// 
+/// 
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::{coins, Addr};
+    use cosmwasm_std::{coins, Addr, Coin, Uint128};
     use cw_multi_test::{error::AnyResult, App, ContractWrapper, Executor};
 
     use crate::msg::ExecuteMsg;
+    use crate::state::DAOProperty;
 
+    /// 
+    /// A wrapper around the code ID of the DAO contract
+    /// 
     pub struct DaoCodeId(u64);
 
     impl DaoCodeId {
@@ -86,7 +104,7 @@ mod tests {
                 crate::contract::execute,
                 crate::contract::instantiate,
                 crate::contract::query,
-            );
+            ).with_reply(crate::contract::reply);
             let code_id = app.store_code(Box::new(contract));
             Self(code_id)
         }
@@ -142,6 +160,26 @@ mod tests {
         }
     }
 
+    /// 
+    /// A wrapper around the property contract (cw-property) to store the code ID
+    /// 
+    pub struct PropertyCodeId(u64);
+
+    impl PropertyCodeId {
+        pub fn store_code(app: &mut App) -> Self {
+            let contract = ContractWrapper::new(
+                cw_property::contract::execute,
+                cw_property::contract::instantiate,
+                cw_property::contract::query,
+            );
+            let code_id = app.store_code(Box::new(contract));
+            Self(code_id)
+        }
+    }
+
+    /// 
+    /// Mock app
+    /// 
     fn mock_app() -> App {
         App::new(|router, _api, storage| {
             router
@@ -164,17 +202,28 @@ mod tests {
     }
 
     #[test]
-    fn owner_can_update_admins() {
+    fn owner_or_admins_can_update_admins() {
         let mut app = mock_app();
         let owner = app.api().addr_make(&"owner".to_string());
         let dao_code_id = DaoCodeId::store_code(&mut app);
         let dao_addr = dao_code_id.instantiate(&mut app, owner.clone(), "test").unwrap();
 
+        // owner can add a new admin
         let new_admin = app.api().addr_make(&"new_admin".to_string());
         app.execute_contract(
             owner.clone(),
             dao_addr.addr(),
             &ExecuteMsg::UpdateAdmins { add: vec![new_admin.clone()], remove: vec![] },
+            &[],
+        )
+        .unwrap();
+
+        // the new admin can add another (3rd) admin
+        let new_admin2 = app.api().addr_make(&"new_admin2".to_string());
+        app.execute_contract(
+            new_admin.clone(),
+            dao_addr.addr(),
+            &ExecuteMsg::UpdateAdmins { add: vec![new_admin2.clone()], remove: vec![] },
             &[],
         )
         .unwrap();
@@ -195,5 +244,57 @@ mod tests {
             &[],
         )
         .unwrap_err();
+    }
+
+    #[test]
+    fn can_set_the_property_contract_code_id() {
+        let mut app = mock_app();
+        let owner = app.api().addr_make(&"owner".to_string());
+        let dao_code_id = DaoCodeId::store_code(&mut app);
+        let dao_addr = dao_code_id.instantiate(&mut app, owner.clone(), "test").unwrap();
+        let property_code_id = PropertyCodeId::store_code(&mut app);
+
+        app.execute_contract(
+            owner.clone(),
+            dao_addr.addr(),
+            &ExecuteMsg::SetPropertyContractCodeId { code_id: property_code_id.0 },
+            &[],
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn can_launch_a_property_contract() {
+        let mut app = mock_app();
+        let owner = app.api().addr_make(&"owner".to_string());
+        let dao_code_id = DaoCodeId::store_code(&mut app);
+        let dao_addr = dao_code_id.instantiate(&mut app, owner.clone(), "test").unwrap();
+        let property_code_id = PropertyCodeId::store_code(&mut app);
+
+        app.execute_contract(
+            owner.clone(),
+            dao_addr.addr(),
+            &ExecuteMsg::SetPropertyContractCodeId { code_id: property_code_id.0 },
+            &[],
+        )
+        .unwrap();
+
+        let result = app.execute_contract(
+            owner.clone(),
+            dao_addr.addr(),
+            &ExecuteMsg::LaunchProperty { data: DAOProperty {
+                price_per_share: Coin::new(100u128, "utoken"),
+                estimated_monthly_income: Coin::new(100u128, "utoken"),
+                estimated_apy: 100,
+                total_shares: 100,
+                status: "Pending".to_string(),
+                subcategory: "Other".to_string(),
+                image_uri: "".to_string(),
+                royalty_fee: 100,
+                property_contract_address: None,
+            } },
+            &[],
+        )
+        .unwrap();
     }
 }

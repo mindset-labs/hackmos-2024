@@ -1,6 +1,15 @@
 [workspace]
 members = ["contracts/*", "packages/*"]
 
+[workspace.package]
+version       = "0.18.0"
+edition       = "2021"
+license       = "MIT"
+repository    = "https://github.com/mindset-labs/hackmos-2024"
+homepage      = "https://mindsetlabs.io"
+documentation = "https://docs.mindsetlabs.io"
+rust-version  = "1.78"
+
 [profile.release.package.cw-dao]
 codegen-units = 1
 incremental = false
@@ -24,3 +33,13 @@ overflow-checks = true
 opt-level = 3
 debug = false
 debug-assertions = false
+
+[workspace.dependencies]
+cosmwasm-schema = { workspace = true }
+cosmwasm-std    = { workspace = true }
+cw-utils        = { workspace = true }
+schemars        = { workspace = true }
+serde           = { workspace = true }
+cw-storage-plus = "2.0.0"
+cw2 = "2.0.0"
+thiserror = { version = "1.0.58" }

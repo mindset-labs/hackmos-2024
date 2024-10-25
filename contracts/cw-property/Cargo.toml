@@ -41,10 +41,11 @@ cw-storage-plus = { workspace = true }
 cw2             = { workspace = true }
 thiserror       = { workspace = true }
 cw20            = { workspace = true }
-cw721 = { path = "../../packages/cw721" }
+cw721           = { path = "../../packages/cw721" }
 cw20-base       = { workspace = true }
 cw721-base      = { workspace = true }
 cw-ownable      = { workspace = true }
+cw404           = { path = "../../packages/cw404" }
 
 [dev-dependencies]
 cw-multi-test = "2.0.0"

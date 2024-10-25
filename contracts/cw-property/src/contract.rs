@@ -21,7 +21,8 @@ pub fn instantiate(
     // TODO: Implement
     
     Ok(Response::default()
-        .add_attribute("action", "instantiate"))
+        .add_attribute("action", "instantiate")
+        .add_attribute("context", msg.context.unwrap_or_default()))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

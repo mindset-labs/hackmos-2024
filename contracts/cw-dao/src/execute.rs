@@ -1,6 +1,6 @@
 use cosmwasm_std::{to_json_binary, Addr, DepsMut, Env, MessageInfo, Response, StdResult, Storage, SubMsg, WasmMsg};
 use cw_property::{msg::InstantiateMsg as PropertyInstantiateMsg};
-use crate::{assert::assert_admin_or_owner, reply::{ReplyMessageId}, state::{DAOProperty, CONFIG}, ContractError};
+use crate::{assert::assert_admin_or_owner, reply::ReplyMessageId, state::{DAOProperty, CONFIG, DAO_PROPERTIES, DAO_PROPERTIES_DRAFT}, ContractError};
 
 pub fn execute_set_property_contract_code_id(deps: DepsMut, info: MessageInfo, code_id: u64) -> Result<Response, ContractError> {
     assert_admin_or_owner(deps.storage, &info.sender)?;
@@ -23,7 +23,7 @@ pub fn execute_launch_property(deps: DepsMut, env: Env, info: MessageInfo, data:
     let instantiate_msg = WasmMsg::Instantiate {
         code_id,
         msg: to_json_binary(&PropertyInstantiateMsg {
-            // TODO: add property metadata
+            context: Some(info.sender.to_string()),
         })?,
         funds: vec![],
         label: "Property Contract Instantiation".to_string(),
@@ -31,9 +31,12 @@ pub fn execute_launch_property(deps: DepsMut, env: Env, info: MessageInfo, data:
         admin: Some(env.contract.address.to_string()),
     };
 
+    // save the property data under the sender's address until the property contract is instantiated
+    // and reply is received
+    DAO_PROPERTIES_DRAFT.save(deps.storage, info.sender.to_string(), &data)?;
+
     // Wrap the instantiate message as a SubMsg, to capture its response
-    let sub_msg = SubMsg::reply_on_success(instantiate_msg, ReplyMessageId::InstantiateProperty as u64)
-        .with_payload(info.sender.as_bytes());
+    let sub_msg = SubMsg::reply_on_success(instantiate_msg, ReplyMessageId::InstantiateProperty as u64);
 
     Ok(Response::new()
         .add_submessage(sub_msg)

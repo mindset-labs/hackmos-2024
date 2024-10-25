@@ -229,15 +229,17 @@ export default function Example() {
         <div className="flex justify-center mb-10">
           <ul role="list" className="grid grid-cols-3 gap-x-4">
             {properties.map((file) => (
-              <TokenizeTrustCard
-                imageUrl="/trust3.jpg"
-                name="Urban Development DAO"
-                category="Commercial Real Estate"
-                numberOfProperties={25}
-                portfolioValue={50000000}
-                numberOfInvestors={1500}
-                apy={7.2}
-              />
+              <Link href={`trust/${file.id}`}>
+                <TokenizeTrustCard
+                  imageUrl="/trust3.jpg"
+                  name="Urban Development DAO"
+                  category="Commercial Real Estate"
+                  numberOfProperties={25}
+                  portfolioValue={50000000}
+                  numberOfInvestors={1500}
+                  apy={7.2}
+                />
+              </Link>
             ))}
           </ul>
         </div>

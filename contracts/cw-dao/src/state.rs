@@ -7,6 +7,7 @@ pub struct Config {
     pub admins: Vec<Addr>,
     pub owner: Addr,
     pub default_royalty_fee: u64, // as a percentage, 2 decimals (100 = 1%)
+    pub property_contract_code_id: Option<u64>,
 }
 
 pub const CONFIG: Item<Config> = Item::new("config");
@@ -33,6 +34,7 @@ pub struct DAOMetadata {
 pub const DAO_METADATA: Item<DAOMetadata> = Item::new("dao_metadata");
 
 #[cw_serde]
+#[derive(Default)]
 pub struct DAOStats {
     pub num_properties: u64,
     pub portfolio_value: u128,
@@ -53,6 +55,7 @@ pub struct DAOProperty {
     pub subcategory: String,
     pub image_uri: String,
     pub royalty_fee: u64, // as a percentage, 2 decimals (100 = 1%)
+    pub property_contract_address: Addr,
 }
 
 // Map of property contract address to DAOProperty configs

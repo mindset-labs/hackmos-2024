@@ -1,10 +1,12 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
+use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdResult};
 
 use crate::error::ContractError;
+use crate::execute::{launch_property, set_property_contract_code_id, update_admins};
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{Config, CONFIG, DAO_METADATA};
+use crate::query::{query_all_properties, query_config, query_property, query_property_contract_code_id, query_stats};
+use crate::state::{Config, DAOStats, CONFIG, DAO_METADATA, DAO_STATS};
 
 const CONTRACT_NAME: &str = "crates.io:cw-dao";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -22,6 +24,7 @@ pub fn instantiate(
         admins: msg.admins,
         owner: info.sender,
         default_royalty_fee: msg.default_royalty_fee.unwrap_or(100), // default to 1%
+        property_contract_code_id: msg.property_contract_code_id,
     };
 
     // validations
@@ -31,6 +34,7 @@ pub fn instantiate(
     // save state
     DAO_METADATA.save(deps.storage, &msg.metadata)?;
     CONFIG.save(deps.storage, &config)?;
+    DAO_STATS.save(deps.storage, &DAOStats::default())?;
 
     Ok(Response::default()
         .add_attribute("action", "instantiate"))
@@ -43,14 +47,26 @@ pub fn execute(
     info: MessageInfo,
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
-    unimplemented!()
+    let response = match msg {
+        ExecuteMsg::SetPropertyContractCodeId { code_id } => set_property_contract_code_id(deps, info, code_id)?,
+        ExecuteMsg::LaunchProperty { data } => launch_property(deps, env, info, data)?,
+        ExecuteMsg::UpdateAdmins { add, remove } => update_admins(deps, info, add, remove)?,
+    };
+    Ok(response)
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
-    unimplemented!()
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::GetConfig {} => to_json_binary(&query_config(deps)?),
+        QueryMsg::GetPropertyContractCodeId {} => to_json_binary(&query_property_contract_code_id(deps)?),
+        QueryMsg::GetAllProperties {} => to_json_binary(&query_all_properties(deps)?),
+        QueryMsg::GetProperty { id } => to_json_binary(&query_property(deps, id)?),
+        QueryMsg::GetStats {} => to_json_binary(&query_stats(deps)?),
+    }
 }
 
+#[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractError> {
     unimplemented!()
 }

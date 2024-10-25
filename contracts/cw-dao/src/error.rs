@@ -18,6 +18,9 @@ pub enum ContractError {
     #[error("Unknown reply message ID")]
     UnknownReplyMessageId {},
 
+    #[error("Property data not found")]
+    PropertyDataNotFound {},
+
     #[error("Unauthorized")]
     Unauthorized {},
     // Add any other custom errors you like here.

@@ -60,3 +60,7 @@ pub struct DAOProperty {
 
 // Map of property contract address to DAOProperty configs
 pub const DAO_PROPERTIES: Map<Addr, DAOProperty> = Map::new("dao_properties");
+
+// Used to temporarily hold the property data under the sender's address
+// before the property contract is instantiated
+pub const DAO_PROPERTIES_DRAFT: Map<String, DAOProperty> = Map::new("dao_properties_draft");

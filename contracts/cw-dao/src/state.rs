@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Addr, Coin, Uint128};
+use cosmwasm_std::{Addr, Coin};
 use cw_storage_plus::{Item, Map};
 
 #[cw_serde]
@@ -55,7 +55,7 @@ pub struct DAOProperty {
     pub subcategory: String,
     pub image_uri: String,
     pub royalty_fee: u64, // as a percentage, 2 decimals (100 = 1%)
-    pub property_contract_address: Addr,
+    pub property_contract_address: Option<Addr>,
 }
 
 // Map of property contract address to DAOProperty configs

@@ -1,6 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::Addr;
-use schemars::Map;
 use crate::state::{Config, DAOMetadata, DAOProperty, DAOStats};
 
 #[cw_serde]

@@ -12,6 +12,12 @@ pub enum ContractError {
     #[error("Invalid royalty fee")]
     InvalidRoyaltyFee {},
 
+    #[error("Property contract code ID not provided")]
+    PropertyCodeIdNotProvided {},
+
+    #[error("Unknown reply message ID")]
+    UnknownReplyMessageId {},
+
     #[error("Unauthorized")]
     Unauthorized {},
     // Add any other custom errors you like here.

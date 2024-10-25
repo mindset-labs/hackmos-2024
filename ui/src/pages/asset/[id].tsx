@@ -40,6 +40,11 @@ export default function Asset() {
     <div className="bg-white">
       <Navbar />
       <div className="container mx-auto p-4 mt-20">
+        <div className="w-full max-w-4xl mx-auto">
+          <Button onClick={() => router.back()} className="mb-4">
+            Go Back
+          </Button>
+        </div>
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">

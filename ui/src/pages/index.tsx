@@ -6,23 +6,27 @@ import {
   LockClosedIcon,
   ServerIcon,
 } from "@heroicons/react/20/solid";
-import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Image, Link } from "@nextui-org/react";
 import { TokenizedAssetCard } from "@/components/TokenizedCard";
+import TokenizeTrustCard from "@/components/TokenizedTrustCard";
 const properties = [
   {
     title: "IMG_4985.HEIC",
     size: "3.9 MB",
     source: "appartment1.jpg",
+    id: 1,
   },
   {
     title: "IMG_4985.HEIC",
     size: "3.9 MB",
     source: "appartment2.jpeg",
+    id: 2,
   },
   {
     title: "IMG_4985.HEIC",
     size: "3.9 MB",
     source: "appartment3.jpg",
+    id: 3,
   },
 ];
 
@@ -220,19 +224,41 @@ export default function Example() {
       </div>
       <div>
         <p className="text-center pb-10 mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+          Trusts
+        </p>
+        <div className="flex justify-center mb-10">
+          <ul role="list" className="grid grid-cols-3 gap-x-4">
+            {properties.map((file) => (
+              <TokenizeTrustCard
+                imageUrl="/trust3.jpg"
+                name="Urban Development DAO"
+                category="Commercial Real Estate"
+                numberOfProperties={25}
+                portfolioValue={50000000}
+                numberOfInvestors={1500}
+                apy={7.2}
+              />
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div>
+        <p className="text-center pb-10 mt-2 text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
           Assets
         </p>
         <div className="flex justify-center">
           <ul role="list" className="grid grid-cols-3 gap-x-4">
             {properties.map((file) => (
-              <TokenizedAssetCard
-                imageUrl="/appartment1.jpg"
-                title="Premium Office Space"
-                pricePerShare={250}
-                apy={7.5}
-                monthlyIncome={1200}
-                category="Commercial Real Estate"
-              />
+              <Link href={`asset/${file.id}`}>
+                <TokenizedAssetCard
+                  imageUrl="/appartment1.jpg"
+                  title="Premium Office Space"
+                  pricePerShare={250}
+                  apy={7.5}
+                  monthlyIncome={1200}
+                  category="Commercial Real Estate"
+                />
+              </Link>
             ))}
           </ul>
         </div>

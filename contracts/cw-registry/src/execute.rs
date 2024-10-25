@@ -1,5 +1,5 @@
 use cosmwasm_std::{to_json_binary, DepsMut, MessageInfo, Response, Storage, SubMsg, WasmMsg};
-use cw_dao::msg::InstantiateMsg as DaoInstantiateMsg;
+use cw_dao::{msg::InstantiateMsg as DaoInstantiateMsg, state::{DAOCategory, DAOMetadata}};
 
 use crate::{
     reply::ReplyMessageId,
@@ -27,8 +27,17 @@ pub fn execute_instantiate_dao(deps: DepsMut, info: MessageInfo) -> Result<Respo
     let instantiate_msg = WasmMsg::Instantiate {
         code_id: code_id.dao_contract_code_id.unwrap(),
         msg: to_json_binary(&DaoInstantiateMsg {
-            name: "DAO".to_string(),
-            symbol: "DAO".to_string(),
+            admins: vec![],
+            metadata: DAOMetadata {
+                name: "DAO".to_string(),
+                description: Some("DAO".to_string()),
+                symbol: Some("DAO".to_string()),
+                image_uri: None,
+                category: DAOCategory::Other,
+                category_other: Some("Car Rental".to_string()),
+            },
+            default_royalty_fee: None,
+            property_contract_code_id: None,
         })?,
         funds: vec![],
         label: "DAO Contract Instantiation".to_string(),

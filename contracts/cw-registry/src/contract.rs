@@ -69,6 +69,7 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
 mod tests {
     use cosmwasm_std::testing::{mock_dependencies, mock_env};
     use cosmwasm_std::{coin, coins, from_json, Addr, Uint128};
+    use cw_dao::state::{DAOCategory, DAOMetadata};
     use cw_multi_test::error::AnyResult;
     use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
     use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
@@ -170,8 +171,18 @@ mod tests {
             label: &str,
         ) -> AnyResult<Self> {
             let init_msg = cw_dao::msg::InstantiateMsg {
-                name: "test".to_string(),
-                symbol: "test".to_string(),
+                admins: vec![],
+                metadata: DAOMetadata {
+                    name: "test".to_string(),
+                    description: Some("test".to_string()),
+                    // links: vec![],
+                    symbol: Some("test".to_string()),
+                    image_uri: None,
+                    category: DAOCategory::Other,
+                    category_other: Some("Car Rental".to_string()),
+                },
+                default_royalty_fee: None,
+                property_contract_code_id: None,
             };
             app.instantiate_contract(code_id.0, sender, &init_msg, &[], label, None)
                 .map(Self::from)

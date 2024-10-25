@@ -1,7 +1,8 @@
 use cosmwasm_std::{to_json_binary, Binary, DepsMut, Env, MessageInfo, Response, StdResult, Storage, Uint128, WasmMsg};
 
+use cw721::Cw721ReceiveMsg;
 use crate::{
-    msg::{Cw721ReceiveMsg, ExecuteMsg}, 
+    msg::ExecuteMsg,
     state::{
         ALLOWANCE, APPROVED_FOR_ALL, BALANCES, BASE_TOKEN_URI, 
         DECIMALS, GET_APPROVED, LOCKED, MINTED, OWNED, OWNED_INDEX, 

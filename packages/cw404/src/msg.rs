@@ -1,8 +1,8 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{to_json_binary, Binary, CosmosMsg, StdResult, Uint128, WasmMsg};
+use cosmwasm_std::{Binary, Uint128};
 use cw20::Cw20ReceiveMsg;
+use cw721::Cw721ReceiveMsg;
 use cw_utils::Expiration;
-use schemars::JsonSchema;
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -188,37 +188,6 @@ pub struct UserInfoResponse {
 pub struct ExtendedInfoResponse {
     pub owned_index: Uint128,
     pub owner_of: String,
-}
-
-/// Cw721ReceiveMsg should be de/serialized under `Receive()` variant in a ExecuteMsg
-/// Updated to be used with cosmwasm_std::Binary v2.1.0
-#[cw_serde]
-pub struct Cw721ReceiveMsg {
-    pub sender: String,
-    pub token_id: String,
-    pub msg: Binary,
-}
-
-impl Cw721ReceiveMsg {
-    /// serializes the message
-    pub fn into_binary(self) -> StdResult<Binary> {
-        let msg = ReceiverExecuteMsg::ReceiveNft(self);
-        to_json_binary(&msg)
-    }
-
-    /// creates a cosmos_msg sending this struct to the named contract
-    pub fn into_cosmos_msg<T: Into<String>, C>(self, contract_addr: T) -> StdResult<CosmosMsg<C>>
-    where
-        C: Clone + std::fmt::Debug + PartialEq + JsonSchema,
-    {
-        let msg = self.into_binary()?;
-        let execute = WasmMsg::Execute {
-            contract_addr: contract_addr.into(),
-            msg,
-            funds: vec![],
-        };
-        Ok(execute.into())
-    }
 }
 
 /// This is just a helper to properly serialize the above message.

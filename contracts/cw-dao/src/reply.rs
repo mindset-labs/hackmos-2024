@@ -1,5 +1,3 @@
-use std::io::Read;
-
 use cosmwasm_std::{Addr, DepsMut, Reply, Response};
 
 use crate::{state::{DAO_PROPERTIES, DAO_PROPERTIES_DRAFT}, ContractError};

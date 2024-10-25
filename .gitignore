@@ -1,2 +1,6 @@
 
 target/
+ui/node_modules/
+ui/.next/
+.DS_Store
+/ui/.DS_Store

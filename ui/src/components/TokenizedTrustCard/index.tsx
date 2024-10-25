@@ -71,6 +71,9 @@ export default function TokenizeTrustCard({
           </div>
         </div>
       </CardContent>
+      <button className="block w-full py-2 text-center bg-black text-white font-semibold hover:bg-white hover:text-black">
+        Preview
+      </button>
     </Card>
   );
 }

@@ -14,16 +14,12 @@ pub struct InstantiateMsg {
     pub decimals: u8,
     // Supply of NFTs max
     pub total_native_supply: Uint128,
-
     // The minter is the only one who can create new NFTs.
     // This is designed for a base NFT that is controlled by an external program
     // or contract. You will likely replace this with custom logic in custom NFTs
     pub minter: Option<String>,
 }
 
-// This is like Cw721ExecuteMsg but we add a Mint command for an owner
-// to make this stand-alone. You will likely want to remove mint and
-// use other control logic in any contract that inherits this.
 #[cw_serde]
 pub enum ExecuteMsg {
     // Transfer is a base message to move a token to another account without triggering actions
@@ -113,17 +109,13 @@ pub enum QueryMsg {
     IsLocked { token_id: String },
     #[returns(cw721::OwnerOfResponse)]
     UserInfo { address: String },
-
     #[returns(cw20::AllowanceResponse)]
     Allowance { owner: String, spender: String },
-
     #[returns(ExtendedInfoResponse)]
     ExtendedInfo { token_id: String },
-
     // Total number of tokens issued
     #[returns(cw721::NumTokensResponse)]
     NumTokens {},
-
     // With MetaData Extension.
     // Returns top-level metadata about the contract
     #[returns(cw721::ContractInfoResponse)]
@@ -131,26 +123,21 @@ pub enum QueryMsg {
     // With MetaData Extension.
     // Returns metadata about one particular token, based on *ERC721 Metadata JSON Schema*
     // but directly from the contract
-    // TODO: replace String with a custom struct
     #[returns(cw721::NftInfoResponse)]
     NftInfo { token_id: String },
-
     #[returns(cw20::BalanceResponse)]
     Balance { address: String },
-
     #[returns(cw20::TokenInfoResponse)]
     TokenInfo {},
     // With MetaData Extension.
     // Returns the result of both `NftInfo` and `OwnerOf` as one query as an optimization
     // for clients
-    // TODO: replace String with a custom struct
     #[returns(cw721::AllNftInfoResponse)]
     AllNftInfo {
         token_id: String,
         // unset or false will filter out expired approvals, you must set to true to see them
         include_expired: Option<bool>,
     },
-
     // With Enumerable extension.
     // Returns all tokens owned by the given address, [] if unset.
     #[returns(cw721::TokensResponse)]
@@ -166,7 +153,6 @@ pub enum QueryMsg {
         start_after: Option<String>,
         limit: Option<u32>,
     },
-
     // Return the minter
     #[returns(MinterResponse)]
     Minter {},
@@ -188,12 +174,4 @@ pub struct UserInfoResponse {
 pub struct ExtendedInfoResponse {
     pub owned_index: Uint128,
     pub owner_of: String,
-}
-
-/// This is just a helper to properly serialize the above message.
-/// The actual receiver should include this variant in the larger ExecuteMsg enum
-#[cw_serde]
-enum ReceiverExecuteMsg {
-    ReceiveNft(Cw721ReceiveMsg),
-    Receive(Cw20ReceiveMsg),
 }

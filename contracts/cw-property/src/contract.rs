@@ -27,17 +27,54 @@ pub fn instantiate(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
-    _deps: DepsMut,
-    _env: Env,
-    _info: MessageInfo,
-    _msg: ExecuteMsg,
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
-    unimplemented!()
+    let response = match msg {
+        // handle all the base cw404 execution
+        ExecuteMsg::Cw404ExecuteMsg(msg) => cw404::contract::execute(deps, env, info, msg)?,
+        // handle property specific execution
+        ExecuteMsg::ListShares { amount } => {
+            unimplemented!()
+        }
+        ExecuteMsg::BuyShares { id, amount } => {
+            unimplemented!()
+        }
+        ExecuteMsg::ReceivePayment(msg) => {
+            unimplemented!()
+        }
+        ExecuteMsg::ReceivePaymentNative {} => {
+            unimplemented!()
+        }
+        ExecuteMsg::ClaimPayout {} => {
+            unimplemented!()
+        }
+    };
+    Ok(response)
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
-    unimplemented!()
+pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    let response = match msg {
+        // handle all the base cw404 queries
+        QueryMsg::Cw404QueryMsg(msg) => cw404::contract::query(deps, env, msg)?,
+        // handle custom property queries
+        QueryMsg::GetPropertyDetails {} => {
+            unimplemented!()
+        }
+        QueryMsg::GetShareHolders {} => {
+            unimplemented!()
+        }
+        QueryMsg::GetShareBalance { id } => {
+            unimplemented!()
+        }
+        QueryMsg::OutstandingShares {} => {
+            unimplemented!()
+        }
+    };
+    Ok(response)
 }
 
 #[cfg(test)]

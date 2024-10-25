@@ -110,7 +110,7 @@ pub fn transfer_from(
             return Err(ContractError::InvalidSender {});
         }
 
-        if to == "" {
+        if to.is_empty() {
             return Err(ContractError::InvalidRecipient {});
         }
 
@@ -447,7 +447,7 @@ fn _transfer(
 }
 
 fn _mint(storage: &mut dyn Storage, env: Env, to: String) -> Result<WasmMsg, ContractError> {
-    if to == "" {
+    if to.is_empty() {
         return Err(ContractError::InvalidRecipient {});
     }
 
@@ -459,7 +459,7 @@ fn _mint(storage: &mut dyn Storage, env: Env, to: String) -> Result<WasmMsg, Con
         .may_load(storage, id.to_string())?
         .unwrap_or("".to_string());
 
-    if owner_of != "" {
+    if !owner_of.is_empty() {
         return Err(ContractError::AlreadyExists {});
     }
 
@@ -486,7 +486,7 @@ fn _mint(storage: &mut dyn Storage, env: Env, to: String) -> Result<WasmMsg, Con
 }
 
 fn _burn(storage: &mut dyn Storage, env: Env, from: String) -> Result<WasmMsg, ContractError> {
-    if from == "" {
+    if from.is_empty() {
         return Err(ContractError::InvalidSender {});
     }
 

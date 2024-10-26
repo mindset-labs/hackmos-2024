@@ -84,7 +84,7 @@ RWAs are digitally represented and managed within the DIFC's regulatory framewor
 ![alt text](./concept/11_rwa_creation_process.png)
 
 #### Rent Payments
-Each entity in the ecosystem benefits from a portion of the rent payments, with fees supporting the DAO and the TOKIFY protocol.
+Rent payments are distributed to investors, with fees supporting the DAO and the TOKIFY protocol.
 
 1. Tenants pay rent in the form of a payment token to the RWA contract.
 2. The RWA contract deducts a 2% property management fee and transfers it to the DAO contract.

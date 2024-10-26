@@ -30,6 +30,7 @@ pub enum ExecuteMsg {
     },
     BuyShares {
         amount: Uint128,
+        from: Option<Addr>,
     },
     ClaimPayout {},
     ReceivePayment(Cw20ReceiveMsg),

@@ -6,7 +6,7 @@ pub enum ContractError {
     #[error("{0}")]
     Std(#[from] StdError),
 
-    #[error("Cw404 error")]
+    #[error("Cw404 error: {0}")]
     Cw404(#[from] cw404::error::ContractError),
 
     #[error("No funds sent")]

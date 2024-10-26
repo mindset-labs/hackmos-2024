@@ -1,5 +1,5 @@
 use cosmwasm_std::{Addr, Coin, DepsMut, Env, MessageInfo, Response, StdResult, Uint128};
-use cw404::state::BALANCES;
+use cw404::state::{BALANCES, DECIMALS};
 
 use crate::{state::CONFIG, ContractError};
 
@@ -15,7 +15,9 @@ pub fn execute_buy_shares(deps: DepsMut, env: Env, info: MessageInfo, from: Opti
     }
 
     let config = CONFIG.load(deps.storage)?;
+    let decimals = DECIMALS.load(deps.storage)?;
     let required_amount = amount * config.price_per_share.amount;
+    let balance_amount = amount * Uint128::from(10u128.pow(decimals.into()));
 
     let amount: Uint128 = info
         .funds
@@ -36,22 +38,22 @@ pub fn execute_buy_shares(deps: DepsMut, env: Env, info: MessageInfo, from: Opti
     // let from_addr = from.unwrap_or(env.contract.address.clone());
     
     // call the cw404 transfer_from function
-    // cw404::execute::transfer(
-    //     deps, 
-    //     env.clone(), 
-    //     info.clone(), 
-    //     env.contract.address.clone().to_string(), 
-    //     info.sender.to_string(),
-    //     amount,
-    // )?;
+    cw404::execute::transfer(
+        deps, 
+        env.clone(), 
+        info.clone(), 
+        env.contract.address.clone().to_string(), 
+        info.sender.to_string(),
+        balance_amount,
+    )?;
 
-    BALANCES.update(deps.storage, &env.contract.address.clone(), |balance| -> StdResult<_> {
-        Ok(balance.unwrap_or_default().checked_sub(required_amount)?)
-    })?;
+    // BALANCES.update(deps.storage, &env.contract.address.clone(), |balance| -> StdResult<_> {
+    //     Ok(balance.unwrap_or_default().checked_sub(required_amount)?)
+    // })?;
 
-    BALANCES.update(deps.storage, &info.sender, |balance| -> StdResult<_> {
-        Ok(balance.unwrap_or_default().checked_add(required_amount)?)
-    })?;
+    // BALANCES.update(deps.storage, &info.sender, |balance| -> StdResult<_> {
+    //     Ok(balance.unwrap_or_default().checked_add(required_amount)?)
+    // })?;
 
     Ok(Response::new())
 }

@@ -281,7 +281,6 @@ mod tests {
             &crate::msg::QueryMsg::OutstandingShares {},
         ).unwrap();
 
-        println!("{:?}", response);
         assert_eq!(response.remaining_shares, Uint128::from(50 * 10u128.pow(2u32)));
     }
 }

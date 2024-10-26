@@ -302,12 +302,12 @@ export default function Example() {
         </p>
         <div className="flex justify-center mb-10">
           <ul role="list" className="grid grid-cols-3 gap-x-4">
-            {properties.map((file) => (
-              <Link href={`trust/${file.id}`}>
+            {trusts.map((file) => (
+              <Link href={`trust/${file._id}`}>
                 <TokenizeTrustCard
-                  imageUrl="/trust3.jpg"
-                  name="Urban Development DAO"
-                  category="Commercial Real Estate"
+                  imageUrl={file.metadata.image}
+                  name={file.metadata.name}
+                  category={file.metadata.category}
                   numberOfProperties={25}
                   portfolioValue={50000000}
                   numberOfInvestors={1500}
@@ -324,15 +324,15 @@ export default function Example() {
         </p>
         <div className="flex justify-center">
           <ul role="list" className="grid grid-cols-3 gap-x-4">
-            {properties.map((file) => (
-              <Link href={`asset/${file.id}`}>
+            {assets.map((file) => (
+              <Link href={`asset/${file._id}`}>
                 <TokenizedAssetCard
-                  imageUrl="/appartment1.jpg"
-                  title="Premium Office Space"
-                  pricePerShare={250}
-                  apy={7.5}
-                  monthlyIncome={1200}
-                  category="Commercial Real Estate"
+                  imageUrl={file.image_uri}
+                  title={file.name}
+                  pricePerShare={file.price_per_share.amount}
+                  apy={file.estimated_apy}
+                  monthlyIncome={file.estimated_monthly_income.amount}
+                  category={file.subcategory}
                 />
               </Link>
             ))}

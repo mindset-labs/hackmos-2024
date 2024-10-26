@@ -21,7 +21,7 @@ export function TokenizedAssetCard({
   return (
     <Card className="w-full max-w-sm overflow-hidden">
       <CardHeader className="p-0">
-        <Image
+        <img
           src={imageUrl}
           alt={title}
           width={300}
@@ -36,7 +36,7 @@ export function TokenizedAssetCard({
             <DollarSign className="w-5 h-5 text-green-500" />
             <div>
               <p className="text-sm font-medium">Price per Share</p>
-              <p className="text-lg font-bold">${pricePerShare.toFixed(2)}</p>
+              <p className="text-lg font-bold">${pricePerShare}</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -50,7 +50,7 @@ export function TokenizedAssetCard({
             <PiggyBank className="w-5 h-5 text-purple-500" />
             <div>
               <p className="text-sm font-medium">Monthly Income</p>
-              <p className="text-lg font-bold">${monthlyIncome.toFixed(2)}</p>
+              <p className="text-lg font-bold">${monthlyIncome}</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">

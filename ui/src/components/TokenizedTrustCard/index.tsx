@@ -23,7 +23,7 @@ export default function TokenizeTrustCard({
   return (
     <Card className="w-full max-w-sm overflow-hidden">
       <CardHeader className="p-0">
-        <Image
+        <img
           src={imageUrl}
           alt={name}
           width={300}

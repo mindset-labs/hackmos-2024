@@ -1,13 +1,16 @@
 import { useChain } from "@cosmos-kit/react";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Coin, StdFee } from "@cosmjs/amino";
+import { CwDaoClient } from "@/utils/protos/ cw-dao/ts/CwDao.client";
+import { DAOProperty } from "@/utils/protos/ cw-dao/ts/CwDao.types";
 
 const ListPropertyForm = () => {
   const chainContext = useChain("mantrachaintestnet2");
+  const [contractAddress, setContractAddress] = useState("");
 
   const fee: StdFee = {
     amount: [{ denom: "uom", amount: "3594" }],
-    gas: "296000",
+    gas: "497883",
   };
 
   const {
@@ -28,6 +31,12 @@ const ListPropertyForm = () => {
     numberOfShares: "",
     apy: "",
     category: "",
+    contractAddress: "",
+    name: "property55",
+    total_shares: "",
+    subcategory: "",
+    symbol: "",
+    royalty_fee: "",
   });
 
   const handleChange = (e) => {
@@ -42,7 +51,66 @@ const ListPropertyForm = () => {
     e.preventDefault();
     // Here you can add your submit logic, like sending data to your backend
     console.log("Property Data:", propertyData);
+
+    createProperty();
   };
+
+  const [trusts, setTrusts] = useState([]);
+  const [selectedTrust, setSelectedTrust] = useState();
+
+  const handleTrustChange = (e: any) => {
+    setSelectedTrust(e.target.value); // Update the selectedTrust state
+    console.log("Selected Trust:", e.target.value);
+    console.log(contractAddress);
+    setContractAddress(e.target.value);
+  };
+  function getAllTrusts() {
+    fetch("/api/getTrusts")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("All Trusts:", data.trusts);
+        setTrusts(data.trusts);
+      })
+      .catch((error) => {
+        console.error("Error fetching trusts:", error);
+      });
+  }
+
+  useEffect(() => {
+    getAllTrusts();
+  }, []);
+
+  const funds = [{ denom: "uom", amount: "1000" }] as Coin[];
+  // const parsedMessage = instantiateMessage;
+
+  async function createProperty() {
+    const executeClient = new CwDaoClient(
+      await chainContext.getSigningCosmWasmClient(),
+      address ?? "",
+      contractAddress
+    );
+
+    const properties: DAOProperty = {
+      estimated_apy: Number(propertyData.apy),
+      estimated_monthly_income: {
+        amount: propertyData.monthlyIncome,
+        denom: "uom",
+      },
+      image_uri:
+        "https://cdn.properties.emaar.com/wp-content/uploads/2020/03/Grande_Living_Final-5k-opt2-2-scaled.jpg",
+      name: propertyData.name,
+      price_per_share: { amount: propertyData.pricePerShare, denom: "uom" },
+      royalty_fee: Number(propertyData.royalty_fee),
+      status: "Active",
+      subcategory: propertyData.category,
+      symbol: propertyData.symbol,
+      total_shares: Number(propertyData.numberOfShares),
+    };
+
+    executeClient.launchProperty({ data: properties }, fee).then((result) => {
+      console.log("Property Created:", result);
+    });
+  }
 
   return (
     <form className="max-w-2xl mx-auto p-6">
@@ -73,6 +141,28 @@ const ListPropertyForm = () => {
           </p>
         </div>
       </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Select Trust
+        </label>
+        <select
+          name="selectedTrust"
+          value={selectedTrust} // Use the selectedTrust state here
+          onChange={handleTrustChange} // Handle trust selection
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required
+        >
+          <option value="">Select a trust</option>
+          {trusts.map((trust) => (
+            <option key={trust.metadata.name} value={trust[0]}>
+              {trust.contractAddress.contractAddress}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-500 mt-1">
+          Select a trust from the list of available trusts.
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
         <div>
@@ -83,6 +173,24 @@ const ListPropertyForm = () => {
             type="number"
             name="monthlyIncome"
             value={propertyData.monthlyIncome}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="5000"
+            required
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            The expected monthly income from this property.
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Name{" "}
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={propertyData.name}
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="5000"

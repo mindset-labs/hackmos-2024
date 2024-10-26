@@ -23,7 +23,7 @@ const CreateTrustForm = () => {
 
   const fee: StdFee = {
     amount: [{ denom: "uom", amount: "3594" }],
-    gas: "336503",
+    gas: "436503",
   };
   const [label, setLabel] = useState("");
   const [instantiateMessage, setInstantiateMessage] = useState("") as any;
@@ -45,7 +45,7 @@ const CreateTrustForm = () => {
     const result = await wasmClient.then((client) => {
       client
         //@ts-ignore
-        .instantiate(address ?? "", 95 ?? 0, parsedMessage, "newTrust", fee, {
+        .instantiate(address ?? "", 97 ?? 0, parsedMessage, "newTrust", fee, {
           funds,
         })
         .then((result: any) => {
@@ -77,7 +77,7 @@ const CreateTrustForm = () => {
 
   const [propertyData, setPropertyData] = useState({
     image: null,
-    propertyContractCodeId: 96,
+    property_contract_code_id: 96,
     category: "",
     name: "",
     description: "",
@@ -108,7 +108,7 @@ const CreateTrustForm = () => {
         category: "real_estate",
       },
       default_royalty_fee: 200,
-      property_contract_code_id: null,
+      property_contract_code_id: 96,
     };
     setInstantiateMessage(data);
 

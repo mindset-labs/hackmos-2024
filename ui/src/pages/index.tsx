@@ -11,7 +11,6 @@ import { TokenizedAssetCard } from "@/components/TokenizedCard";
 import TokenizeTrustCard from "@/components/TokenizedTrustCard";
 import { useEffect, useState } from "react";
 import { useChain } from "@cosmos-kit/react";
-import { CwDaoClient } from "../utils/protos/ cw-dao/ts/CwDao.client";
 
 const properties = [
   {
@@ -134,6 +133,8 @@ export default function Example() {
 
   const [queryMessageResultTrust, setQueryMessageResultTrust] = useState("");
   const [trusts, setTrusts] = useState([]);
+  const [assets, setAssets] = useState([]);
+
   const [queryMessageInProcess, setQueryMessageInProcess] = useState(false);
   const queryContract = async () => {
     setQueryMessageInProcess(true);
@@ -166,6 +167,39 @@ export default function Example() {
       queryContract();
     }
   }, [chainContext.isWalletConnected]);
+
+  function getAllTrusts() {
+    fetch("/api/getTrusts")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("All Trusts:", data.trusts);
+        setTrusts(data.trusts);
+      })
+      .catch((error) => {
+        console.error("Error fetching trusts:", error);
+      });
+  }
+
+  function getAllAssets() {
+    // Fetch assets from the API
+    fetch("/api/getAssets")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("All Assets:", data.assets);
+        setAssets(data.assets); // Set the fetched assets in the state
+      })
+      .catch((error) => {
+        console.error("Error fetching assets:", error);
+      });
+  }
+
+  useEffect(() => {
+    getAllTrusts();
+    getAllAssets();
+    console.log("Trusts:", trusts);
+    console.log("Assets:", assets);
+  }, []);
+
   return (
     <div className="bg-white">
       <Navbar />

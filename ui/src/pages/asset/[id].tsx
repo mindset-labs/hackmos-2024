@@ -3,8 +3,7 @@
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/router";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -18,10 +17,11 @@ import { Label } from "@/components/Label";
 
 export default function Asset() {
   const router = useRouter();
+  const id = router.query.id;
 
   const [sharesToBuy, setSharesToBuy] = useState(1);
 
-  const assetData = {
+  const [assetData, setAssetData] = useState({
     name: "Luxury Apartment Complex",
     image: "/appartment1.jpg",
     pricePerShare: 100,
@@ -29,12 +29,33 @@ export default function Asset() {
     monthlyIncome: 500,
     category: "Real Estate",
     availableShares: 1000,
-  };
+  });
 
   const handleInvest = () => {
     console.log(`Investing in ${sharesToBuy} shares`);
     // Implement investment logic here
   };
+
+  useEffect(() => {
+    if (router.isReady) {
+      console.log("trying to fetch this id", router.query.id);
+      // Fetch asset by ID
+      fetch(`/api/assets/${id}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Asset not found");
+          }
+          console.log({ response });
+          return response.json();
+        })
+        .then((data) => {
+          setAssetData(data);
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+    }
+  }, [router.isReady, router.query]);
 
   return (
     <div className="bg-white">
@@ -48,14 +69,14 @@ export default function Asset() {
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">
-              {assetData.name}
+              {assetData?.name}
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-6 md:grid-cols-2">
             <div className="space-y-4">
-              <Image
-                src={assetData.image}
-                alt={assetData.name}
+              <img
+                src={assetData?.image_uri}
+                alt={assetData?.name}
                 width={400}
                 height={300}
                 className="w-full rounded-lg object-cover"
@@ -63,23 +84,23 @@ export default function Asset() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="font-semibold">Price per share</p>
-                  <p>${assetData.pricePerShare.toFixed(2)}</p>
+                  <p>${assetData?.price_per_share.amount}</p>
                 </div>
                 <div>
                   <p className="font-semibold">APY</p>
-                  <p>{assetData.apy}%</p>
+                  <p>{assetData?.estimated_apy}%</p>
                 </div>
                 <div>
                   <p className="font-semibold">Monthly income</p>
-                  <p>${assetData.monthlyIncome.toFixed(2)}</p>
+                  <p>${assetData?.estimated_monthly_income.amount}</p>
                 </div>
                 <div>
                   <p className="font-semibold">Category</p>
-                  <p>{assetData.category}</p>
+                  <p>{assetData?.subcategory}</p>
                 </div>
                 <div>
                   <p className="font-semibold">Available shares</p>
-                  <p>{assetData.availableShares.toLocaleString()}</p>
+                  <p>{assetData?.total_shares}</p>
                 </div>
               </div>
             </div>
@@ -99,14 +120,12 @@ export default function Asset() {
               <div>
                 <p className="text-lg font-semibold">
                   Total Investment: $
-                  {(sharesToBuy * assetData.pricePerShare).toFixed(2)}
+                  {sharesToBuy * assetData?.price_per_share.amount}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Estimated Monthly Income: $
-                  {(
-                    (sharesToBuy * assetData.monthlyIncome) /
-                    assetData.availableShares
-                  ).toFixed(2)}
+                  {(sharesToBuy * assetData?.estimated_monthly_income.amount) /
+                    assetData.total_shares}
                 </p>
               </div>
             </div>

@@ -56,7 +56,7 @@ const user = {
 };
 
 export default function Portfolio() {
-  const chainContext = useChain("neutron");
+  const chainContext = useChain("mantrachaintestnet2");
 
   const {
     status,

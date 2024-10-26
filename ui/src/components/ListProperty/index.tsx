@@ -1,6 +1,26 @@
+import { useChain } from "@cosmos-kit/react";
 import React, { useState } from "react";
+import { Coin, StdFee } from "@cosmjs/amino";
 
 const ListPropertyForm = () => {
+  const chainContext = useChain("mantrachaintestnet2");
+
+  const fee: StdFee = {
+    amount: [{ denom: "uom", amount: "3594" }],
+    gas: "296000",
+  };
+
+  const {
+    status,
+    username,
+    address,
+    message,
+    connect,
+    disconnect,
+    openView,
+    isWalletConnected,
+  } = chainContext;
+
   const [propertyData, setPropertyData] = useState({
     image: null,
     monthlyIncome: "",

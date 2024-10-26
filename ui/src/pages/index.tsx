@@ -9,6 +9,10 @@ import {
 import { Card, CardHeader, CardBody, Image, Link } from "@nextui-org/react";
 import { TokenizedAssetCard } from "@/components/TokenizedCard";
 import TokenizeTrustCard from "@/components/TokenizedTrustCard";
+import { useEffect, useState } from "react";
+import { useChain } from "@cosmos-kit/react";
+import { CwDaoClient } from "../utils/protos/ cw-dao/ts/CwDao.client";
+
 const properties = [
   {
     title: "IMG_4985.HEIC",
@@ -126,6 +130,42 @@ const footerNavigation = {
 };
 
 export default function Example() {
+  const chainContext = useChain("mantrachaintestnet2");
+
+  const [queryMessageResultTrust, setQueryMessageResultTrust] = useState("");
+  const [trusts, setTrusts] = useState([]);
+  const [queryMessageInProcess, setQueryMessageInProcess] = useState(false);
+  const queryContract = async () => {
+    setQueryMessageInProcess(true);
+    const wasmClient = chainContext.getSigningCosmWasmClient();
+    const queryDAO = {
+      get_metadata: {},
+    };
+    const parsedMessage = queryDAO;
+
+    await wasmClient.then((client) => {
+      client
+        .queryContractSmart(
+          "mantra1z87qy8fdv2fcq8mdh6hn9ftv42lvmtear7q0gp4wg2w9fdkjfsgsszqn4q",
+          parsedMessage
+        )
+        .then((result: any) => {
+          console.log(result);
+          setQueryMessageResultTrust(result);
+          setQueryMessageInProcess(false);
+        })
+        .catch((e) => {
+          console.error(e);
+          setQueryMessageInProcess(false);
+        });
+    });
+  };
+
+  useEffect(() => {
+    if (chainContext.isWalletConnected) {
+      queryContract();
+    }
+  }, [chainContext.isWalletConnected]);
   return (
     <div className="bg-white">
       <Navbar />

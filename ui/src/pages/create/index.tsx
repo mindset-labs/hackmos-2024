@@ -1,3 +1,5 @@
+"use-client";
+
 import CreateTrustForm from "@/components/CreateTrust";
 import Navbar from "@/components/Navbar";
 

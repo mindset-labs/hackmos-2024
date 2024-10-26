@@ -3,16 +3,18 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useChain } from "@cosmos-kit/react";
 import Link from "next/link";
+import chain from "chain-registry/testnet/mantrachaintestnet/chain";
 
 const navigation = [
   { name: "Create a Trust", href: "/create" },
   { name: "List a Property", href: "/list" },
   { name: "Portfolio", href: "/portfolio" },
+  { name: "Marketplace", href: "/marketplace" },
 ];
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const chainContext = useChain("neutron");
+  const chainContext = useChain("mantrachaintestnet2");
 
   const {
     status,
@@ -65,7 +67,11 @@ export default function Navbar() {
             href="#"
             className="text-sm font-semibold leading-6 text-gray-900 bg-gray-100 p-2 rounded-lg"
           >
-            {isWalletConnected ? address : "Log in"}{" "}
+            {isWalletConnected
+              ? address?.slice(0, address.length - 30) +
+                "..." +
+                address?.slice(-4)
+              : "Log in"}{" "}
             <span aria-hidden="true">&rarr;</span>
           </a>
         </div>

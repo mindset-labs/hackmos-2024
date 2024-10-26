@@ -45,7 +45,7 @@ cw721           = { path = "../../packages/cw721" }
 cw20-base       = { workspace = true }
 cw721-base      = { workspace = true }
 cw-ownable      = { workspace = true }
-cw404           = { path = "../../packages/cw404" }
+cw404           = { path = "../../packages/cw404", features = ["library"] }
 
 [dev-dependencies]
 cw-multi-test = "2.0.0"

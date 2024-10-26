@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, Uint128};
+use cosmwasm_std::{Addr, Coin, Uint128};
 use cw20::Cw20ReceiveMsg;
 use cw404::msg::{QueryMsg as Cw404QueryMsg, ExecuteMsg as Cw404ExecuteMsg};
 
@@ -9,6 +9,14 @@ pub struct InstantiateMsg {
     pub symbol: String,
     pub context: Option<String>,
     pub total_shares: Uint128,
+    pub price_per_share: Coin,
+    pub estimated_monthly_income: Coin,
+    pub estimated_apy: u64,
+    pub status: String,
+    pub subcategory: String,
+    pub image_uri: String,
+    pub royalty_fee: u64,
+    pub property_contract_address: Option<String>,
 }
 
 #[cw_serde]
@@ -21,7 +29,6 @@ pub enum ExecuteMsg {
         amount: Uint128,
     },
     BuyShares {
-        id: String,
         amount: Uint128,
     },
     ClaimPayout {},

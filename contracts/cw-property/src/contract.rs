@@ -4,7 +4,9 @@ use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult}
 // use cw2::set_contract_version;
 
 use crate::error::ContractError;
+use crate::execute::execute_buy_shares;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::state::{Config, CONFIG};
 
 const CONTRACT_NAME: &str = "crates.io:cw-property";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -17,6 +19,17 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
+    // save the property config
+    CONFIG.save(deps.storage, &Config {
+        price_per_share: msg.price_per_share,
+        estimated_monthly_income: msg.estimated_monthly_income,
+        estimated_apy: msg.estimated_apy,
+        status: msg.status,
+        subcategory: msg.subcategory,
+        image_uri: msg.image_uri,
+        royalty_fee: msg.royalty_fee,
+    })?;
 
     // instantiate the base cw404 contract internally
     cw404::instantiate::instantiate(deps.storage, env.clone(), info.clone(), cw404::msg::InstantiateMsg {
@@ -47,10 +60,8 @@ pub fn execute(
         // handle property specific execution
         ExecuteMsg::ListShares { amount } => {
             unimplemented!()
-        }
-        ExecuteMsg::BuyShares { id, amount } => {
-            unimplemented!()
-        }
+        },
+        ExecuteMsg::BuyShares { amount } => execute_buy_shares(deps, env, info, amount)?,
         ExecuteMsg::ReceivePayment(msg) => {
             unimplemented!()
         }

@@ -1,4 +1,4 @@
-use cosmwasm_std::StdError;
+use cosmwasm_std::{StdError, Uint128};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -8,6 +8,14 @@ pub enum ContractError {
 
     #[error("Cw404 error")]
     Cw404(#[from] cw404::error::ContractError),
+
+    #[error("No funds sent")]
+    NoFundsSent {},
+
+    #[error("Insufficient funds")]
+    InsufficientFunds {
+        required: Uint128,
+    },
 
     #[error("Unauthorized")]
     Unauthorized {},

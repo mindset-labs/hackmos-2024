@@ -16,7 +16,7 @@ pub struct InstantiateMsg {
     pub total_native_supply: Uint128,
     // The minter is the only one who can create new NFTs.
     // This is designed for a base NFT that is controlled by an external program
-    // or contract. You will likely replace this with custom logic in custom NFTs
+    // or contract.
     pub minter: Option<String>,
 }
 

@@ -47,6 +47,8 @@ pub const DAO_STATS: Item<DAOStats> = Item::new("dao_stats");
 
 #[cw_serde]
 pub struct DAOProperty {
+    pub name: String,
+    pub symbol: String,
     pub price_per_share: Coin,
     pub estimated_monthly_income: Coin,
     pub estimated_apy: u64, // as a percentage, 2 decimals (100 = 1%)

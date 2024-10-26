@@ -284,6 +284,8 @@ mod tests {
             owner.clone(),
             dao_addr.addr(),
             &ExecuteMsg::LaunchProperty { data: DAOProperty {
+                name: "test".to_string(),
+                symbol: "test".to_string(),
                 price_per_share: Coin::new(100u128, "utoken"),
                 estimated_monthly_income: Coin::new(100u128, "utoken"),
                 estimated_apy: 100,

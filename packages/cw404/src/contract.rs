@@ -5,9 +5,10 @@ use cw20::{BalanceResponse, TokenInfoResponse};
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{BALANCES, DECIMALS, MINTED, NAME, OWNER, SYMBOL, TOTAL_SUPPLY};
+use crate::state::{BALANCES, DECIMALS, NAME, SYMBOL, TOTAL_SUPPLY};
 use crate::query::*;
 use crate::execute::*;
+use crate::instantiate::instantiate as instantiate_base;
 
 const CONTRACT_NAME: &str = "crates.io:cw404";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -21,14 +22,7 @@ pub fn instantiate(
 ) -> Result<Response, ContractError> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
-    let total_supply = msg.total_native_supply.u128() * ((10u128).pow(msg.decimals.into()));
-    DECIMALS.save(deps.storage, &msg.decimals)?;
-    TOTAL_SUPPLY.save(deps.storage, &Uint128::from(total_supply))?;
-    MINTED.save(deps.storage, &Uint128::zero())?;
-    NAME.save(deps.storage, &msg.name)?;
-    SYMBOL.save(deps.storage, &msg.symbol)?;
-    OWNER.save(deps.storage, &info.sender.to_string())?;
-    BALANCES.save(deps.storage, &info.sender, &Uint128::from(total_supply))?;
+    let total_supply = instantiate_base(deps.storage, env, info.clone(), msg)?;
 
     Ok(Response::new()
         .add_attribute("action", "mint")

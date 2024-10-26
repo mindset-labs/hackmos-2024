@@ -18,8 +18,17 @@ pub fn instantiate(
 ) -> Result<Response, ContractError> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
-    // TODO: Implement
-    
+    // instantiate the base cw404 contract internally
+    cw404::instantiate::instantiate(deps.storage, env.clone(), info.clone(), cw404::msg::InstantiateMsg {
+        name: msg.name,
+        symbol: msg.symbol,
+        decimals: 2,
+        total_native_supply: msg.total_shares,
+        minter: None,
+    })?;
+    // give full allowance to the property contract
+    cw404::execute::approve_all(deps, env.clone(), info.clone(), env.contract.address.to_string())?;
+
     Ok(Response::default()
         .add_attribute("action", "instantiate")
         .add_attribute("context", msg.context.unwrap_or_default()))

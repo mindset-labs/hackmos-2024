@@ -1,4 +1,4 @@
-use cosmwasm_std::{to_json_binary, Addr, DepsMut, Env, MessageInfo, Response, StdResult, Storage, SubMsg, WasmMsg};
+use cosmwasm_std::{to_json_binary, Addr, DepsMut, Env, MessageInfo, Response, StdResult, Storage, SubMsg, Uint128, WasmMsg};
 use cw_property::{msg::InstantiateMsg as PropertyInstantiateMsg};
 use crate::{assert::assert_admin_or_owner, reply::ReplyMessageId, state::{DAOProperty, CONFIG, DAO_PROPERTIES, DAO_PROPERTIES_DRAFT}, ContractError};
 
@@ -23,6 +23,9 @@ pub fn execute_launch_property(deps: DepsMut, env: Env, info: MessageInfo, data:
     let instantiate_msg = WasmMsg::Instantiate {
         code_id,
         msg: to_json_binary(&PropertyInstantiateMsg {
+            name: data.name.clone(),
+            symbol: data.symbol.clone(),
+            total_shares: Uint128::from(10_000u128),
             context: Some(info.sender.to_string()),
         })?,
         funds: vec![],

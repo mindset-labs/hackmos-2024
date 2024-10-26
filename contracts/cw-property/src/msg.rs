@@ -5,7 +5,10 @@ use cw404::msg::{QueryMsg as Cw404QueryMsg, ExecuteMsg as Cw404ExecuteMsg};
 
 #[cw_serde]
 pub struct InstantiateMsg {
+    pub name: String,
+    pub symbol: String,
     pub context: Option<String>,
+    pub total_shares: Uint128,
 }
 
 #[cw_serde]

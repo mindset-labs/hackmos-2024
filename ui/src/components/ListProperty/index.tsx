@@ -3,10 +3,12 @@ import React, { use, useEffect, useState } from "react";
 import { Coin, StdFee } from "@cosmjs/amino";
 import { CwDaoClient } from "@/utils/protos/ cw-dao/ts/CwDao.client";
 import { DAOProperty } from "@/utils/protos/ cw-dao/ts/CwDao.types";
+import JSONBig from "json-bigint";
 
 const ListPropertyForm = () => {
   const chainContext = useChain("mantrachaintestnet2");
   const [contractAddress, setContractAddress] = useState("");
+  const [isAssetCreated, setIsAssetCreated] = useState(false);
 
   const fee: StdFee = {
     amount: [{ denom: "uom", amount: "3594" }],
@@ -32,14 +34,14 @@ const ListPropertyForm = () => {
     apy: "",
     category: "",
     contractAddress: "",
-    name: "property55",
+    name: "",
     total_shares: "",
     subcategory: "",
     symbol: "",
     royalty_fee: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     const { name, value, files } = e.target;
     setPropertyData({
       ...propertyData,
@@ -47,7 +49,7 @@ const ListPropertyForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     // Here you can add your submit logic, like sending data to your backend
     console.log("Property Data:", propertyData);
@@ -107,9 +109,29 @@ const ListPropertyForm = () => {
       total_shares: Number(propertyData.numberOfShares),
     };
 
-    executeClient.launchProperty({ data: properties }, fee).then((result) => {
-      console.log("Property Created:", result);
-    });
+    executeClient
+      .launchProperty({ data: properties }, fee)
+      .then((result) => {
+        console.log("Property Created:", result);
+        setIsAssetCreated(true);
+        fetch("/api/listAsset", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSONBig.stringify({ properties }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   }
 
   return (
@@ -185,7 +207,7 @@ const ListPropertyForm = () => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Name{" "}
+            Name
           </label>
           <input
             type="text"
@@ -193,11 +215,11 @@ const ListPropertyForm = () => {
             value={propertyData.name}
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            placeholder="5000"
+            placeholder="My Property"
             required
           />
           <p className="text-xs text-gray-500 mt-1">
-            The expected monthly income from this property.
+            The legal name of the asset.
           </p>
         </div>
 
@@ -277,6 +299,11 @@ const ListPropertyForm = () => {
           Select the category that best describes this property.
         </p>
       </div>
+      {isAssetCreated && (
+        <div className="bg-[#31B47A] my-5 p-3 rounded-full text-white font-bold">
+          <p className="text-center">Asset created succesfully</p>
+        </div>
+      )}
 
       <button
         onClick={handleSubmit}

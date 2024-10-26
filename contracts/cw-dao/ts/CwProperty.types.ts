@@ -39,11 +39,13 @@ export interface DAOProperty {
   estimated_apy: number;
   estimated_monthly_income: Coin;
   image_uri: string;
+  name: string;
   price_per_share: Coin;
-  property_contract_address: Addr;
+  property_contract_address?: Addr | null;
   royalty_fee: number;
   status: string;
   subcategory: string;
+  symbol: string;
   total_shares: number;
 }
 export interface Coin {
@@ -52,6 +54,8 @@ export interface Coin {
 }
 export type QueryMsg = {
   get_config: {};
+} | {
+  get_metadata: {};
 } | {
   get_property_contract_code_id: {};
 } | {

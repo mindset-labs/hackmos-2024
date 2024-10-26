@@ -6,10 +6,11 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Addr, DAOCategory, InstantiateMsg, DAOMetadata, ExecuteMsg, Uint128, DAOProperty, Coin, QueryMsg, ArrayOfDAOProperty, Config, NullableDAOProperty, Nullableuint64, DAOStats } from "./CwDao.types";
-export interface CwDaoReadOnlyInterface {
+import { Addr, DAOCategory, InstantiateMsg, DAOMetadata, ExecuteMsg, Uint128, DAOProperty, Coin, QueryMsg, ArrayOfDAOProperty, Config, NullableDAOProperty, Nullableuint64, DAOStats } from "./CwProperty.types";
+export interface CwPropertyReadOnlyInterface {
   contractAddress: string;
   getConfig: () => Promise<Config>;
+  getMetadata: () => Promise<DAOMetadata>;
   getPropertyContractCodeId: () => Promise<NullableUint64>;
   getAllProperties: () => Promise<ArrayOfDAOProperty>;
   getProperty: ({
@@ -19,13 +20,14 @@ export interface CwDaoReadOnlyInterface {
   }) => Promise<NullableDAOProperty>;
   getStats: () => Promise<DAOStats>;
 }
-export class CwDaoQueryClient implements CwDaoReadOnlyInterface {
+export class CwPropertyQueryClient implements CwPropertyReadOnlyInterface {
   client: CosmWasmClient;
   contractAddress: string;
   constructor(client: CosmWasmClient, contractAddress: string) {
     this.client = client;
     this.contractAddress = contractAddress;
     this.getConfig = this.getConfig.bind(this);
+    this.getMetadata = this.getMetadata.bind(this);
     this.getPropertyContractCodeId = this.getPropertyContractCodeId.bind(this);
     this.getAllProperties = this.getAllProperties.bind(this);
     this.getProperty = this.getProperty.bind(this);
@@ -34,6 +36,11 @@ export class CwDaoQueryClient implements CwDaoReadOnlyInterface {
   getConfig = async (): Promise<Config> => {
     return this.client.queryContractSmart(this.contractAddress, {
       get_config: {}
+    });
+  };
+  getMetadata = async (): Promise<DAOMetadata> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      get_metadata: {}
     });
   };
   getPropertyContractCodeId = async (): Promise<NullableUint64> => {
@@ -63,7 +70,7 @@ export class CwDaoQueryClient implements CwDaoReadOnlyInterface {
     });
   };
 }
-export interface CwDaoInterface extends CwDaoReadOnlyInterface {
+export interface CwPropertyInterface extends CwPropertyReadOnlyInterface {
   contractAddress: string;
   sender: string;
   setPropertyContractCodeId: ({
@@ -84,7 +91,7 @@ export interface CwDaoInterface extends CwDaoReadOnlyInterface {
     remove: Addr[];
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
 }
-export class CwDaoClient extends CwDaoQueryClient implements CwDaoInterface {
+export class CwPropertyClient extends CwPropertyQueryClient implements CwPropertyInterface {
   client: SigningCosmWasmClient;
   sender: string;
   contractAddress: string;

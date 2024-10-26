@@ -1,11 +1,12 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
 // use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::execute::execute_buy_shares;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::query::{query_outstanding_shares, query_share_balance};
 use crate::state::{Config, CONFIG};
 
 const CONTRACT_NAME: &str = "crates.io:cw-property";
@@ -81,9 +82,9 @@ pub fn execute(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
-    let response = match msg {
+    match msg {
         // handle all the base cw404 queries
-        QueryMsg::Cw404QueryMsg(msg) => cw404::contract::query(deps, env, msg)?,
+        QueryMsg::Cw404QueryMsg(msg) => Ok(cw404::contract::query(deps, env, msg)?),
         // handle custom property queries
         QueryMsg::GetPropertyDetails {} => {
             unimplemented!()
@@ -91,14 +92,9 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::GetShareHolders {} => {
             unimplemented!()
         }
-        QueryMsg::GetShareBalance { id } => {
-            unimplemented!()
-        }
-        QueryMsg::OutstandingShares {} => {
-            unimplemented!()
-        }
-    };
-    Ok(response)
+        QueryMsg::GetShareBalance { address } => to_json_binary(&query_share_balance(deps, env, address)?),
+        QueryMsg::OutstandingShares {} => to_json_binary(&query_outstanding_shares(deps, env)?),
+    }
 }
 
 /// 
@@ -115,7 +111,7 @@ mod tests {
     use cosmwasm_std::{coin, coins, Addr, Coin, Uint128};
     use cw_multi_test::{error::AnyResult, App, ContractWrapper, Executor};
 
-    use crate::msg::ExecuteMsg;
+    use crate::msg::{ExecuteMsg, OutstandingSharesResponse};
 
     /// 
     /// A wrapper around the code ID of the DAO contract
@@ -248,11 +244,47 @@ mod tests {
         app.execute_contract(
             buyer.clone(),
             property_contract.addr().clone(),
-            &ExecuteMsg::BuyShares { amount: Uint128::from(10u128), from: Some(property_contract.addr()) },
+            &ExecuteMsg::BuyShares { amount: Uint128::from(1u128), from: Some(property_contract.addr()) },
             &[
                 coin(1000, "utoken"),
             ],
         ).unwrap();
+
+        let balance_updated: cw20::BalanceResponse = app.wrap().query_wasm_smart(
+            property_contract.addr(),
+            &crate::msg::QueryMsg::Cw404QueryMsg(cw404::msg::QueryMsg::Balance {
+                address: buyer.to_string(),
+            }),
+        ).unwrap();
+
+        assert_eq!(balance_updated.balance, Uint128::from(10u128.pow(2u32)));
+    }
+
+    #[test]
+    fn check_available_shares() {
+        let mut app = mock_app();
+        let owner = app.api().addr_make("owner");
+        let buyer = app.api().addr_make("buyer");
+        let property_code_id = PropertyCodeId::store_code(&mut app);
+        let property_contract = property_code_id.instantiate(&mut app, owner.clone(), "test").unwrap();
+
+        app.execute_contract(
+            buyer.clone(),
+            property_contract.addr().clone(),
+            &ExecuteMsg::BuyShares { amount: Uint128::from(50u128), from: None },
+            &[
+                coin(10_000, "utoken"),
+            ],
+        ).unwrap();
+
+        // the user just bought 10 shares, so there should be 90 shares left
+        let response: OutstandingSharesResponse = app.wrap().query_wasm_smart(
+            property_contract.addr(),
+            &crate::msg::QueryMsg::OutstandingShares {},
+        ).unwrap();
+
+        println!("{:?}", response);
+        assert_eq!(response.remaining_shares, Uint128::from(50 * 10u128.pow(2u32)));
     }
 }
 

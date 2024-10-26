@@ -36,14 +36,21 @@ pub fn execute_buy_shares(deps: DepsMut, env: Env, info: MessageInfo, from: Opti
     // let from_addr = from.unwrap_or(env.contract.address.clone());
     
     // call the cw404 transfer_from function
-    // cw404::execute::transfer(deps, env.clone(), info.clone(), env.contract.address.clone().to_string(), info.sender.to_string(), amount)?;
+    // cw404::execute::transfer(
+    //     deps, 
+    //     env.clone(), 
+    //     info.clone(), 
+    //     env.contract.address.clone().to_string(), 
+    //     info.sender.to_string(),
+    //     amount,
+    // )?;
 
     BALANCES.update(deps.storage, &env.contract.address.clone(), |balance| -> StdResult<_> {
-        Ok(balance.unwrap_or_default().checked_sub(amount)?)
+        Ok(balance.unwrap_or_default().checked_sub(required_amount)?)
     })?;
 
     BALANCES.update(deps.storage, &info.sender, |balance| -> StdResult<_> {
-        Ok(balance.unwrap_or_default().checked_add(amount)?)
+        Ok(balance.unwrap_or_default().checked_add(required_amount)?)
     })?;
 
     Ok(Response::new())

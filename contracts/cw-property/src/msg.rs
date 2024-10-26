@@ -49,8 +49,15 @@ pub enum QueryMsg {
     GetPropertyDetails {},
     #[returns(Option<()>)]
     GetShareHolders {},
-    #[returns(Option<()>)]
-    GetShareBalance { id: Addr },
-    #[returns(Option<()>)]
+    #[returns(Uint128)]
+    GetShareBalance { address: Addr },
+    #[returns(OutstandingSharesResponse)]
     OutstandingShares {},
+}
+
+#[cw_serde]
+pub struct OutstandingSharesResponse {
+    pub outstanding_shares: Uint128,
+    pub total_shares: Uint128,
+    pub remaining_shares: Uint128,
 }

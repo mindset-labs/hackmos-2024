@@ -382,18 +382,18 @@ fn _transfer(
 ) -> Result<Response, ContractError> {
     let from_addr = deps.api.addr_validate(&from)?;
     let to_addr = deps.api.addr_validate(&to)?;
-    let unit = get_unit(deps.storage)?;
-    let balance_before_sender = BALANCES
-        .may_load(deps.storage, &from_addr)?
-        .unwrap_or_default();
-    let balance_before_receiver = BALANCES
-        .may_load(deps.storage, &to_addr)?
-        .unwrap_or_default();
+    // let unit = get_unit(deps.storage)?;
+    // let balance_before_sender = BALANCES
+    //     .may_load(deps.storage, &from_addr)?
+    //     .unwrap_or_default();
+    // let balance_before_receiver = BALANCES
+    //     .may_load(deps.storage, &to_addr)?
+    //     .unwrap_or_default();
 
     BALANCES.update(
         deps.storage,
         &from_addr,
-        |balance: Option<Uint128>| -> StdResult<_> {
+        |balance: Option<Uint128>| -> StdResult<Uint128> {
             Ok(balance.unwrap_or_default().checked_sub(amount)?)
         },
     )?;
@@ -401,45 +401,45 @@ fn _transfer(
     BALANCES.update(
         deps.storage,
         &to_addr,
-        |balance: Option<Uint128>| -> StdResult<_> { Ok(balance.unwrap_or_default() + amount) },
+        |balance: Option<Uint128>| -> StdResult<Uint128> { Ok(balance.unwrap_or_default() + amount) },
     )?;
 
-    let whitelist_from = WHITELIST
-        .may_load(deps.storage, from.clone())?
-        .unwrap_or_default();
-    let whitelist_to = WHITELIST
-        .may_load(deps.storage, to.clone())?
-        .unwrap_or_default();
+    // let whitelist_from = WHITELIST
+    //     .may_load(deps.storage, from.clone())?
+    //     .unwrap_or_default();
+    // let whitelist_to = WHITELIST
+    //     .may_load(deps.storage, to.clone())?
+    //     .unwrap_or_default();
 
-    let mut messages = vec![];
-    // Skip burn for certain addresses to save gas
-    if !whitelist_from {
-        let tokens_to_burn = (balance_before_sender / unit)
-            - (BALANCES
-                .may_load(deps.storage, &from_addr)?
-                .unwrap_or_default()
-                / unit);
-        for _i in 0..tokens_to_burn.u128() {
-            let msg = _burn(deps.storage, env.clone(), from.clone())?;
-            messages.push(msg);
-        }
-    }
+    // let mut messages = vec![];
+    // // Skip burn for certain addresses to save gas
+    // if !whitelist_from {
+    //     let tokens_to_burn = (balance_before_sender / unit)
+    //         - (BALANCES
+    //             .may_load(deps.storage, &from_addr)?
+    //             .unwrap_or_default()
+    //             / unit);
+    //     for _i in 0..tokens_to_burn.u128() {
+    //         let msg = _burn(deps.storage, env.clone(), from.clone())?;
+    //         messages.push(msg);
+    //     }
+    // }
 
-    // Skip minting for certain addresses to save gas
-    if !whitelist_to {
-        let tokens_to_mint = (BALANCES
-            .may_load(deps.storage, &to_addr)?
-            .unwrap_or_default()
-            / unit)
-            - (balance_before_receiver / unit);
-        for _i in 0..tokens_to_mint.u128() {
-            let msg = _mint(deps.storage, env.clone(), to.clone())?;
-            messages.push(msg);
-        }
-    }
+    // // Skip minting for certain addresses to save gas
+    // if !whitelist_to {
+    //     let tokens_to_mint = (BALANCES
+    //         .may_load(deps.storage, &to_addr)?
+    //         .unwrap_or_default()
+    //         / unit)
+    //         - (balance_before_receiver / unit);
+    //     for _i in 0..tokens_to_mint.u128() {
+    //         let msg = _mint(deps.storage, env.clone(), to.clone())?;
+    //         messages.push(msg);
+    //     }
+    // }
 
     Ok(Response::new()
-        .add_messages(messages)
+        // .add_messages(messages)
         .add_attribute("action", event.to_string())
         .add_attribute("from", from)
         .add_attribute("to", to)

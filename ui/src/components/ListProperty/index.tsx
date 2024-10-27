@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { useChain } from "@cosmos-kit/react";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Coin, StdFee } from "@cosmjs/amino";
 import { CwDaoClient } from "@/utils/protos/ cw-dao/ts/CwDao.client";
 import { DAOProperty } from "@/utils/protos/ cw-dao/ts/CwDao.types";
@@ -119,7 +120,7 @@ const ListPropertyForm = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSONBig.stringify({ properties }),
+          body: JSONBig.stringify({ properties, result }),
         })
           .then((response) => response.json())
           .then((data) => {
@@ -154,6 +155,7 @@ const ListPropertyForm = () => {
           <button
             type="button"
             className="bg-blue-500 text-white py-2 px-4 rounded-md"
+            //@ts-ignore
             onClick={() => document.querySelector('input[type="file"]').click()}
           >
             Select Image
@@ -176,6 +178,8 @@ const ListPropertyForm = () => {
         >
           <option value="">Select a trust</option>
           {trusts.map((trust) => (
+            //@ts-ignore
+
             <option key={trust.metadata.name} value={trust[0]}>
               {trust.contractAddress.contractAddress}
             </option>

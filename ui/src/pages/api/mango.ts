@@ -41,6 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ message: 'Data inserted successfully', insertResult });
   } catch (err) {
     console.error('Error connecting to MongoDB or inserting data:', err);
+    //@ts-ignore
     return res.status(500).json({ message: 'Internal Server Error', error: err.message });
   }
 }

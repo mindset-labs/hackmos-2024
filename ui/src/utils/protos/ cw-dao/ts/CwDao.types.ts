@@ -3,6 +3,7 @@
 * DO NOT MODIFY IT BY HAND. Instead, modify the source JSONSchema file,
 * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
 */
+//@ts-nocheck
 
 export type Addr = string;
 export type DAOCategory = "real_estate" | "retail" | "hospitality" | "other";

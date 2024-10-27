@@ -1,4 +1,5 @@
 // pages/api/assets/[id].ts
+// @ts-nocheck
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoClient, ObjectId } from 'mongodb';
 

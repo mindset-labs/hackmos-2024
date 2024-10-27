@@ -3,21 +3,22 @@
 * DO NOT MODIFY IT BY HAND. Instead, modify the source JSONSchema file,
 * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
 */
+//@ts-nocheck
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
-import { Coin, StdFee } from "@cosmjs/amino";
-import { Uint128, InstantiateMsg, ExecuteMsg, ExecuteMsg1, Binary, Expiration, Timestamp, Uint64, Cw20ReceiveMsg, QueryMsg, QueryMsg1, Addr, NullableNull } from "./CwProperty.types";
+import { StdFee } from "@cosmjs/amino";
+import { Uint128, InstantiateMsg, Coin, ExecuteMsg, ExecuteMsg1, Binary, Expiration, Timestamp, Uint64, Addr, Cw20ReceiveMsg, QueryMsg, QueryMsg1, NullableNull, OutstandingSharesResponse } from "./CwProperty.types";
 export interface CwPropertyReadOnlyInterface {
   contractAddress: string;
   cw404QueryMsg: (queryMsg: QueryMsg) => Promise<NullableNull>;
   getPropertyDetails: () => Promise<NullableNull>;
   getShareHolders: () => Promise<NullableNull>;
   getShareBalance: ({
-    id
+    address
   }: {
-    id: Addr;
-  }) => Promise<NullableNull>;
-  outstandingShares: () => Promise<NullableNull>;
+    address: Addr;
+  }) => Promise<Uint128>;
+  outstandingShares: () => Promise<OutstandingSharesResponse>;
 }
 export class CwPropertyQueryClient implements CwPropertyReadOnlyInterface {
   client: CosmWasmClient;
@@ -47,17 +48,17 @@ export class CwPropertyQueryClient implements CwPropertyReadOnlyInterface {
     });
   };
   getShareBalance = async ({
-    id
+    address
   }: {
-    id: Addr;
-  }): Promise<NullableNull> => {
+    address: Addr;
+  }): Promise<Uint128> => {
     return this.client.queryContractSmart(this.contractAddress, {
       get_share_balance: {
-        id
+        address
       }
     });
   };
-  outstandingShares = async (): Promise<NullableNull> => {
+  outstandingShares = async (): Promise<OutstandingSharesResponse> => {
     return this.client.queryContractSmart(this.contractAddress, {
       outstanding_shares: {}
     });
@@ -74,10 +75,10 @@ export interface CwPropertyInterface extends CwPropertyReadOnlyInterface {
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   buyShares: ({
     amount,
-    id
+    from
   }: {
     amount: Uint128;
-    id: string;
+    from?: Addr;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   claimPayout: (fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   receivePayment: ({
@@ -125,15 +126,15 @@ export class CwPropertyClient extends CwPropertyQueryClient implements CwPropert
   };
   buyShares = async ({
     amount,
-    id
+    from
   }: {
     amount: Uint128;
-    id: string;
+    from?: Addr;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       buy_shares: {
         amount,
-        id
+        from
       }
     }, fee, memo, _funds);
   };

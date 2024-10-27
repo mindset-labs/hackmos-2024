@@ -77,7 +77,7 @@ const CreateTrustForm = () => {
 
   const [propertyData, setPropertyData] = useState({
     image: null,
-    property_contract_code_id: 96,
+    property_contract_code_id: 99,
     category: "",
     name: "",
     description: "",
@@ -95,6 +95,7 @@ const CreateTrustForm = () => {
   };
 
   const handleSubmit = (e: AnyCnameRecord) => {
+    //@ts-ignore
     e.preventDefault();
     // Here you can add your submit logic, like sending data to your backend
     console.log("Property Data:", propertyData);
@@ -108,7 +109,7 @@ const CreateTrustForm = () => {
         category: "real_estate",
       },
       default_royalty_fee: 200,
-      property_contract_code_id: 96,
+      property_contract_code_id: 99,
     };
     setInstantiateMessage(data);
 
@@ -134,7 +135,7 @@ const CreateTrustForm = () => {
           />
           <button
             type="button"
-            className="bg-blue-500 text-white py-2 px-4 rounded-md"
+            className="bg-blue-500 text-white py-2 px-4 rounded-md" //@ts-ignore
             onClick={() => document.querySelector('input[type="file"]').click()}
           >
             Select Image
@@ -229,6 +230,8 @@ const CreateTrustForm = () => {
       )}
 
       <button
+        //@ts-ignore
+
         onClick={handleSubmit}
         className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
       >

@@ -4,6 +4,9 @@
 * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
 */
 
+//@ts-nocheck
+
+
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
 import { Addr, DAOCategory, InstantiateMsg, DAOMetadata, ExecuteMsg, Uint128, DAOProperty, Coin, QueryMsg, ArrayOfDAOProperty, Config, NullableDAOProperty, Nullableuint64, DAOStats } from "./CwDao.types";

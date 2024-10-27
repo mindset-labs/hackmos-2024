@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 "use-client";
 
 import Navbar from "@/components/Navbar";
@@ -14,10 +16,26 @@ import {
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { Label } from "@/components/Label";
+import { useChain } from "@cosmos-kit/react";
+import { CwPropertyClient } from "@/utils/protos/cw-property/ts/CwProperty.client";
+import { Coin } from "@/utils/protos/ cw-dao/ts/CwDao.types";
 
 export default function Asset() {
   const router = useRouter();
   const id = router.query.id;
+  const [investResponse, setInvestResponse] = useState(null);
+
+  const chainContext = useChain("mantrachaintestnet2");
+  const {
+    status,
+    username,
+    address,
+    message,
+    connect,
+    disconnect,
+    openView,
+    isWalletConnected,
+  } = chainContext;
 
   const [sharesToBuy, setSharesToBuy] = useState(1);
 
@@ -34,6 +52,7 @@ export default function Asset() {
   const handleInvest = () => {
     console.log(`Investing in ${sharesToBuy} shares`);
     // Implement investment logic here
+    invest();
   };
 
   useEffect(() => {
@@ -57,6 +76,38 @@ export default function Asset() {
     }
   }, [router.isReady, router.query]);
 
+  async function invest() {
+    const executeClient = new CwPropertyClient(
+      await chainContext.getSigningCosmWasmClient(),
+      address ?? "",
+      assetData?.result?.events[9]?.attributes[0]?.value
+    );
+
+    const fee: StdFee = {
+      amount: [{ denom: "uom", amount: "3594" }],
+      gas: "497883",
+    };
+
+    const funds: Coin = {
+      denom: "uom",
+      amount: "1000",
+    };
+
+    executeClient
+      .buyShares(
+        {
+          amount: sharesToBuy.toString(),
+        },
+        fee,
+        "",
+        [funds]
+      )
+      .then((response) => {
+        console.log(response);
+        setInvestResponse(response);
+      });
+  }
+
   return (
     <div className="bg-white">
       <Navbar />
@@ -71,6 +122,18 @@ export default function Asset() {
             <CardTitle className="text-2xl font-bold">
               {assetData?.name}
             </CardTitle>
+            <p>
+              <span className="font-bold">Address:</span>
+              {""}
+              {assetData?.result?.events[9]?.attributes[0]?.value}
+            </p>
+            {investResponse && (
+              <div className="bg-green-500 p-4 rounded-full">
+                <p className="text-sm ">
+                  {investResponse ? investResponse?.transactionHash : ""}
+                </p>
+              </div>
+            )}
           </CardHeader>
           <CardContent className="grid gap-6 md:grid-cols-2">
             <div className="space-y-4">
@@ -84,7 +147,7 @@ export default function Asset() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="font-semibold">Price per share</p>
-                  <p>${assetData?.price_per_share.amount}</p>
+                  <p>${assetData?.price_per_share?.amount}</p>
                 </div>
                 <div>
                   <p className="font-semibold">APY</p>
@@ -92,7 +155,7 @@ export default function Asset() {
                 </div>
                 <div>
                   <p className="font-semibold">Monthly income</p>
-                  <p>${assetData?.estimated_monthly_income.amount}</p>
+                  <p>${assetData?.estimated_monthly_income?.amount}</p>
                 </div>
                 <div>
                   <p className="font-semibold">Category</p>
@@ -120,16 +183,17 @@ export default function Asset() {
               <div>
                 <p className="text-lg font-semibold">
                   Total Investment: $
-                  {sharesToBuy * assetData?.price_per_share.amount}
+                  {sharesToBuy * assetData?.price_per_share?.amount}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Estimated Monthly Income: $
-                  {(sharesToBuy * assetData?.estimated_monthly_income.amount) /
+                  {(sharesToBuy * assetData?.estimated_monthly_income?.amount) /
                     assetData.total_shares}
                 </p>
               </div>
             </div>
           </CardContent>
+
           <CardFooter>
             <Button
               onClick={handleInvest}

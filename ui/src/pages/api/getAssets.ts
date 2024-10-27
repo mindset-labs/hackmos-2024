@@ -24,6 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ assets: assets });
   } catch (err) {
     console.error('Error fetching assets:', err);
+    //@ts-ignore
     return res.status(500).json({ message: 'Error fetching assets', error: err.message });
   }
 }

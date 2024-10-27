@@ -30,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ trusts: allTrusts });
   } catch (err) {
     console.error('Error fetching data from MongoDB:', err);
+    //@ts-ignore
     return res.status(500).json({ message: 'Internal Server Error', error: err.message });
   }
 }

@@ -6,7 +6,7 @@ use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Resp
 use crate::error::ContractError;
 use crate::execute::execute_buy_shares;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::query::{query_outstanding_shares, query_share_balance};
+use crate::query::{query_outstanding_shares, query_property_details, query_share_balance};
 use crate::state::{Config, CONFIG};
 
 const CONTRACT_NAME: &str = "crates.io:cw-property";
@@ -86,9 +86,7 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
         // handle all the base cw404 queries
         QueryMsg::Cw404QueryMsg(msg) => Ok(cw404::contract::query(deps, env, msg)?),
         // handle custom property queries
-        QueryMsg::GetPropertyDetails {} => {
-            unimplemented!()
-        }
+        QueryMsg::GetPropertyDetails {} => to_json_binary(&query_property_details(deps, env)?),
         QueryMsg::GetShareHolders {} => {
             unimplemented!()
         }

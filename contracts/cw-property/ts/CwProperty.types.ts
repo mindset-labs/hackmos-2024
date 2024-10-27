@@ -7,9 +7,21 @@
 export type Uint128 = string;
 export interface InstantiateMsg {
   context?: string | null;
+  estimated_apy: number;
+  estimated_monthly_income: Coin;
+  image_uri: string;
   name: string;
+  price_per_share: Coin;
+  property_contract_address?: string | null;
+  royalty_fee: number;
+  status: string;
+  subcategory: string;
   symbol: string;
   total_shares: Uint128;
+}
+export interface Coin {
+  amount: Uint128;
+  denom: string;
 }
 export type ExecuteMsg = {
   cw404_execute_msg: ExecuteMsg1;
@@ -20,7 +32,7 @@ export type ExecuteMsg = {
 } | {
   buy_shares: {
     amount: Uint128;
-    id: string;
+    from?: Addr | null;
   };
 } | {
   claim_payout: {};
@@ -120,6 +132,7 @@ export type Expiration = {
 };
 export type Timestamp = Uint64;
 export type Uint64 = string;
+export type Addr = string;
 export interface Cw20ReceiveMsg {
   amount: Uint128;
   msg: Binary;
@@ -133,7 +146,7 @@ export type QueryMsg = {
   get_share_holders: {};
 } | {
   get_share_balance: {
-    id: Addr;
+    address: Addr;
   };
 } | {
   outstanding_shares: {};
@@ -193,5 +206,9 @@ export type QueryMsg1 = {
 } | {
   minter: {};
 };
-export type Addr = string;
 export type NullableNull = null;
+export interface OutstandingSharesResponse {
+  outstanding_shares: Uint128;
+  remaining_shares: Uint128;
+  total_shares: Uint128;
+}

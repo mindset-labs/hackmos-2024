@@ -198,4 +198,4 @@ These files can be uploaded to any network which supports `wasmd` version `0.51+
 - [TOKIFY Telegram](https://t.me/TokiFyProtocol)
 - [TOKIFY X / Twitter](https://x.com/TokiFyProtocol)
 - TOKIFY Website - coming soon...
-- [FAQ](./FAQ.md)
+- [FAQ](./documentation/faq.md)

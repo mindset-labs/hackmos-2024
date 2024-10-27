@@ -291,7 +291,7 @@ export default function Example() {
           Trusts
         </p>
         <div className="flex justify-center mb-10">
-          <ul role="list" className="grid grid-cols-3 gap-x-4">
+          <ul role="list" className="grid grid-cols-1 md:grid-cols-3 gap-x-4">
             {trusts.map((file) => (
               <Link href={`trust/${file._id}`}>
                 <TokenizeTrustCard
@@ -313,7 +313,10 @@ export default function Example() {
           Assets
         </p>
         <div className="flex justify-center">
-          <ul role="list" className="grid grid-cols-3 gap-x-4">
+          <ul
+            role="list"
+            className="grid  grid-cols-1 md:grid-cols-3 gap gap-x-4 "
+          >
             {assets.map((file) => (
               <Link href={`asset/${file._id}`}>
                 <TokenizedAssetCard

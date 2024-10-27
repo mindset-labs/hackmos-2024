@@ -1,6 +1,6 @@
 use cosmwasm_schema::write_api;
 
-use sample::msg::{ExecuteMsg, QueryMsg};
+use tokifykyc::msg::{ExecuteMsg, QueryMsg};
 
 fn main() {
     write_api! {

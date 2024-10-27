@@ -21,7 +21,7 @@ cargo run schema
 
 cd ../..
 
-# generate sample contract schema
+# generate tokify-kyc contract schema
 cd contracts
 cargo build
 cargo run schema

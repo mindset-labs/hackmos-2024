@@ -6,8 +6,8 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Addr, DAOCategory, InstantiateMsg, DAOMetadata, ExecuteMsg, Uint128, DAOProperty, Coin, QueryMsg, ArrayOfDAOProperty, Config, NullableDAOProperty, Nullableuint64, DAOStats } from "./CwProperty.types";
-export interface CwPropertyReadOnlyInterface {
+import { Addr, DAOCategory, InstantiateMsg, DAOMetadata, ExecuteMsg, Uint128, DAOProperty, Coin, QueryMsg, ArrayOfDAOProperty, Config, NullableDAOProperty, Nullableuint64, DAOStats } from "./CwDao.types";
+export interface CwDaoReadOnlyInterface {
   contractAddress: string;
   getConfig: () => Promise<Config>;
   getMetadata: () => Promise<DAOMetadata>;
@@ -20,7 +20,7 @@ export interface CwPropertyReadOnlyInterface {
   }) => Promise<NullableDAOProperty>;
   getStats: () => Promise<DAOStats>;
 }
-export class CwPropertyQueryClient implements CwPropertyReadOnlyInterface {
+export class CwDaoQueryClient implements CwDaoReadOnlyInterface {
   client: CosmWasmClient;
   contractAddress: string;
   constructor(client: CosmWasmClient, contractAddress: string) {
@@ -70,7 +70,7 @@ export class CwPropertyQueryClient implements CwPropertyReadOnlyInterface {
     });
   };
 }
-export interface CwPropertyInterface extends CwPropertyReadOnlyInterface {
+export interface CwDaoInterface extends CwDaoReadOnlyInterface {
   contractAddress: string;
   sender: string;
   setPropertyContractCodeId: ({
@@ -91,7 +91,7 @@ export interface CwPropertyInterface extends CwPropertyReadOnlyInterface {
     remove: Addr[];
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
 }
-export class CwPropertyClient extends CwPropertyQueryClient implements CwPropertyInterface {
+export class CwDaoClient extends CwDaoQueryClient implements CwDaoInterface {
   client: SigningCosmWasmClient;
   sender: string;
   contractAddress: string;

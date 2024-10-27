@@ -115,7 +115,7 @@ const footerNavigation = {
 };
 
 export default function Example() {
-  const chainContext = useChain("mantrachaintestnet2");
+  const chainContext = useChain("neutrontestnet");
 
   const [queryMessageResultTrust, setQueryMessageResultTrust] = useState("");
   const [trusts, setTrusts] = useState([]);

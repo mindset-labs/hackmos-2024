@@ -124,7 +124,7 @@ const user = {
 };
 
 export default function Portfolio() {
-  const chainContext = useChain("mantrachaintestnet2");
+  const chainContext = useChain("neutrontestnet");
 
   const { address, connect, isWalletConnected } = chainContext;
 

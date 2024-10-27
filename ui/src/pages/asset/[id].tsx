@@ -25,7 +25,7 @@ export default function Asset() {
   const id = router.query.id;
   const [investResponse, setInvestResponse] = useState(null);
 
-  const chainContext = useChain("mantrachaintestnet2");
+  const chainContext = useChain("neutrontestnet");
   const {
     status,
     username,
@@ -84,12 +84,12 @@ export default function Asset() {
     );
 
     const fee: StdFee = {
-      amount: [{ denom: "uom", amount: "3594" }],
+      amount: [{ denom: "untrn", amount: "3594" }],
       gas: "497883",
     };
 
     const funds: Coin = {
-      denom: "uom",
+      denom: "untrn",
       amount: "1000",
     };
 

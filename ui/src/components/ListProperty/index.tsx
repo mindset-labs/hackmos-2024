@@ -7,12 +7,12 @@ import { DAOProperty } from "@/utils/protos/ cw-dao/ts/CwDao.types";
 import JSONBig from "json-bigint";
 
 const ListPropertyForm = () => {
-  const chainContext = useChain("mantrachaintestnet2");
+  const chainContext = useChain("neutrontestnet");
   const [contractAddress, setContractAddress] = useState("");
   const [isAssetCreated, setIsAssetCreated] = useState(false);
 
   const fee: StdFee = {
-    amount: [{ denom: "uom", amount: "3594" }],
+    amount: [{ denom: "untrn", amount: "3594" }],
     gas: "497883",
   };
 
@@ -83,7 +83,7 @@ const ListPropertyForm = () => {
     getAllTrusts();
   }, []);
 
-  const funds = [{ denom: "uom", amount: "1000" }] as Coin[];
+  const funds = [{ denom: "untrn", amount: "1000" }] as Coin[];
   // const parsedMessage = instantiateMessage;
 
   async function createProperty() {
@@ -97,12 +97,12 @@ const ListPropertyForm = () => {
       estimated_apy: Number(propertyData.apy),
       estimated_monthly_income: {
         amount: propertyData.monthlyIncome,
-        denom: "uom",
+        denom: "untrn",
       },
       image_uri:
         "https://cdn.properties.emaar.com/wp-content/uploads/2020/03/Grande_Living_Final-5k-opt2-2-scaled.jpg",
       name: propertyData.name,
-      price_per_share: { amount: propertyData.pricePerShare, denom: "uom" },
+      price_per_share: { amount: propertyData.pricePerShare, denom: "untrn" },
       royalty_fee: Number(propertyData.royalty_fee),
       status: "Active",
       subcategory: propertyData.category,

@@ -14,7 +14,7 @@ const navigation = [
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const chainContext = useChain("mantrachaintestnet2");
+  const chainContext = useChain("neutrontestnet");
 
   const {
     status,
